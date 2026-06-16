@@ -12,6 +12,7 @@ func RegisterRoutes(app *fiber.App, productHandler *ProductHandler, authHandler 
 
 	app.Post("/auth/register", authHandler.Register)
 	app.Post("/auth/login", authHandler.Login)
+	app.Post("/auth/logout", authMiddleware.RequireAuth, authHandler.Logout)
 
 	app.Get("/me", authMiddleware.RequireAuth, Me)
 	app.Get("/cart", authMiddleware.RequireAuth, cartHandler.GetCart)

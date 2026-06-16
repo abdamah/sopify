@@ -142,3 +142,24 @@ func (r *UserRepository) SaveToken(ctx context.Context, userID, token string) (*
 
 	return &user, nil
 }
+
+func (r *UserRepository) ClearToken(ctx context.Context, userID string) error {
+	result, err := r.db.ExecContext(ctx, `
+		UPDATE users
+		SET token = NULL, updated_at = NOW()
+		WHERE id = $1 AND active = true
+	`, userID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrUserNotFound
+	}
+
+	return nil
+}
