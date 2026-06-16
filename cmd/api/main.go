@@ -26,14 +26,7 @@ func main() {
 	}
 	defer db.Close()
 
-	if cfg.ClerkJWKSURL == "" || cfg.ClerkIssuer == "" {
-		log.Fatal("CLERK_JWKS_URL and CLERK_ISSUER are required")
-	}
-
-	clerkVerifier, err := auth.NewVerifier(cfg.ClerkJWKSURL, cfg.ClerkIssuer)
-	if err != nil {
-		log.Fatal(err)
-	}
+	jwtService := auth.NewJWTService(cfg.JWTSecret, cfg.JWTExpiry)
 
 	app := fiber.New()
 	middleware.SetupLogger(app)
@@ -41,9 +34,11 @@ func main() {
 
 	productRepo := repository.NewProductRepository(db)
 	userRepo := repository.NewUserRepository(db)
-	authMiddleware := middleware.NewAuthMiddleware(clerkVerifier, userRepo)
+	authMiddleware := middleware.NewAuthMiddleware(jwtService, userRepo)
 	productHandler := handlers.NewProductHandler(productRepo)
-	handlers.RegisterRoutes(app, productHandler, authMiddleware)
+	authHandler := handlers.NewAuthHandler(userRepo, jwtService)
+
+	handlers.RegisterRoutes(app, productHandler, authHandler, authMiddleware)
 
 	log.Printf("[api] listening on :%s", cfg.Port)
 	log.Fatal(app.Listen(":"+cfg.Port, fiber.ListenConfig{

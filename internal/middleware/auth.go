@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"log"
 	"strings"
 
@@ -13,14 +14,14 @@ import (
 const userLocalKey = "user"
 
 type AuthMiddleware struct {
-	verifier *auth.Verifier
-	userRepo *repository.UserRepository
+	jwtService *auth.JWTService
+	userRepo   *repository.UserRepository
 }
 
-func NewAuthMiddleware(verifier *auth.Verifier, userRepo *repository.UserRepository) *AuthMiddleware {
+func NewAuthMiddleware(jwtService *auth.JWTService, userRepo *repository.UserRepository) *AuthMiddleware {
 	return &AuthMiddleware{
-		verifier: verifier,
-		userRepo: userRepo,
+		jwtService: jwtService,
+		userRepo:   userRepo,
 	}
 }
 
@@ -37,21 +38,33 @@ func (m *AuthMiddleware) RequireAuth(c fiber.Ctx) error {
 		})
 	}
 
-	claims, err := m.verifier.Verify(token)
+	claims, err := m.jwtService.Verify(token)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "invalid token",
 		})
 	}
 
-	user, err := m.userRepo.FindOrCreateByClerkID(c.Context(), claims.ClerkID, claims.Email, claims.Role)
+	user, err := m.userRepo.GetByID(c.Context(), claims.UserID)
+	if errors.Is(err, repository.ErrUserInactive) {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "account inactive",
+		})
+	}
 	if err != nil {
-		log.Printf("[api] find or create user %s: %v", claims.ClerkID, err)
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"error": "failed to load user",
+		log.Printf("[api] load user %s: %v", claims.UserID, err)
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "invalid token",
+		})
+	}
+	if user.Token == "" || user.Token != token {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "invalid token",
 		})
 	}
 
+	user.Password = ""
+	user.Token = ""
 	c.Locals(userLocalKey, user)
 	return c.Next()
 }
