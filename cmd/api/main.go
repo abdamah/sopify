@@ -6,6 +6,7 @@ import (
 	"github.com/abdamah/dailykode/sopify/backend/internal/config"
 	"github.com/abdamah/dailykode/sopify/backend/internal/database"
 	"github.com/abdamah/dailykode/sopify/backend/internal/handlers"
+	"github.com/abdamah/dailykode/sopify/backend/internal/repository"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -22,7 +23,10 @@ func main() {
 	defer db.Close()
 
 	app := fiber.New()
-	handlers.RegisterRoutes(app)
+
+	productRepo := repository.NewProductRepository(db)
+	productHandler := handlers.NewProductHandler(productRepo)
+	handlers.RegisterRoutes(app, productHandler)
 
 	log.Printf("Sopify API listening on :%s", cfg.Port)
 	log.Fatal(app.Listen(":" + cfg.Port))
