@@ -6,6 +6,7 @@ import (
 	"github.com/abdamah/dailykode/sopify/backend/internal/config"
 	"github.com/abdamah/dailykode/sopify/backend/internal/database"
 	"github.com/abdamah/dailykode/sopify/backend/internal/handlers"
+	"github.com/abdamah/dailykode/sopify/backend/internal/middleware"
 	"github.com/abdamah/dailykode/sopify/backend/internal/repository"
 	"github.com/gofiber/fiber/v3"
 )
@@ -23,6 +24,7 @@ func main() {
 	defer db.Close()
 
 	app := fiber.New()
+	middleware.SetupCORS(app)
 
 	productRepo := repository.NewProductRepository(db)
 	productHandler := handlers.NewProductHandler(productRepo)
