@@ -81,6 +81,30 @@ func (h *ProductHandler) CreateProduct(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(product)
 }
 
+func (h *ProductHandler) DeleteProduct(c fiber.Ctx) error {
+	id := c.Params("id")
+	if _, err := uuid.Parse(id); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid product id",
+		})
+	}
+
+	err := h.repo.DeleteProduct(c.Context(), id)
+	if errors.Is(err, repository.ErrProductNotFound) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "product not found",
+		})
+	}
+	if err != nil {
+		log.Printf("[api] delete product %s: %v", id, err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "failed to delete product",
+		})
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
+}
+
 func validateCreateProductInput(input models.CreateProductInput) string {
 	switch {
 	case input.Name == "":

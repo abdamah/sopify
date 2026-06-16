@@ -98,3 +98,20 @@ func (r *ProductRepository) CreateProduct(ctx context.Context, input models.Crea
 
 	return &product, nil
 }
+
+func (r *ProductRepository) DeleteProduct(ctx context.Context, id string) error {
+	row, err := r.db.ExecContext(ctx, `DELETE FROM products WHERE id = $1`, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := row.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrProductNotFound
+	}
+
+	return nil
+}

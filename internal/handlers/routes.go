@@ -7,4 +7,5 @@ func RegisterRoutes(app *fiber.App, productHandler *ProductHandler) {
 	app.Get("/products", productHandler.ProductList)
 	app.Get("/products/:id", productHandler.GetProductByID)
 	app.Post("/admin/products", productHandler.CreateProduct)
+	app.Delete("/admin/products/:id", productHandler.DeleteProduct)
 }
