@@ -4,6 +4,8 @@ import "github.com/gofiber/fiber/v3"
 
 func RegisterRoutes(app *fiber.App, productHandler *ProductHandler) {
 	app.Get("/health", Health)
-	app.Get("/products", productHandler.List)
-	app.Get("/products/:id", productHandler.GetByID)
+	app.Get("/products", productHandler.ProductList)
+	app.Get("/products/:id", productHandler.GetProductByID)
+	app.Post("/admin/products", productHandler.CreateProduct)
+	app.Delete("/admin/products/:id", productHandler.DeleteProduct)
 }

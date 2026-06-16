@@ -75,3 +75,43 @@ func (r *ProductRepository) GetProductByID(ctx context.Context, id string) (*mod
 
 	return &product, nil
 }
+
+func (r *ProductRepository) CreateProduct(ctx context.Context, input models.CreateProductInput) (*models.Product, error) {
+	var product models.Product
+	err := r.db.QueryRowContext(ctx, `
+		INSERT INTO products (name, description, price, stock)
+		VALUES ($1, $2, $3, $4)
+		RETURNING id, name, description, price, image_url, stock, created_at, updated_at
+	`, input.Name, input.Description, input.Price, input.Stock).Scan(
+		&product.ID,
+		&product.Name,
+		&product.Description,
+		&product.Price,
+		&product.ImageURL,
+		&product.Stock,
+		&product.CreatedAt,
+		&product.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &product, nil
+}
+
+func (r *ProductRepository) DeleteProduct(ctx context.Context, id string) error {
+	row, err := r.db.ExecContext(ctx, `DELETE FROM products WHERE id = $1`, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := row.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrProductNotFound
+	}
+
+	return nil
+}
