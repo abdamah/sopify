@@ -1,0 +1,77 @@
+package repository
+
+import (
+	"context"
+	"database/sql"
+	"errors"
+
+	"github.com/abdamah/dailykode/sopify/backend/internal/models"
+)
+
+var ErrProductNotFound = errors.New("product not found")
+
+type ProductRepository struct {
+	db *sql.DB
+}
+
+func NewProductRepository(db *sql.DB) *ProductRepository {
+	return &ProductRepository{db: db}
+}
+
+func (r *ProductRepository) ListProducts(ctx context.Context) ([]models.Product, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT id, name, description, price, image_url, stock, created_at, updated_at
+		FROM products
+		ORDER BY created_at DESC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	products := make([]models.Product, 0)
+	for rows.Next() {
+		var product models.Product
+		if err := rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Description,
+			&product.Price,
+			&product.ImageURL,
+			&product.Stock,
+			&product.CreatedAt,
+			&product.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		products = append(products, product)
+	}
+
+	return products, rows.Err()
+}
+
+func (r *ProductRepository) GetProductByID(ctx context.Context, id string) (*models.Product, error) {
+	var product models.Product
+	err := r.db.QueryRowContext(ctx, `
+		SELECT id, name, description, price, image_url, stock, created_at, updated_at
+		FROM products
+		WHERE id = $1
+	`, id).Scan(
+		&product.ID,
+		&product.Name,
+		&product.Description,
+		&product.Price,
+		&product.ImageURL,
+		&product.Stock,
+		&product.CreatedAt,
+		&product.UpdatedAt,
+	)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, ErrProductNotFound
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &product, nil
+}
