@@ -10,9 +10,9 @@ func RegisterRoutes(app *fiber.App, productHandler *ProductHandler, authMiddlewa
 	app.Get("/products", productHandler.ProductList)
 	app.Get("/products/:id", productHandler.GetProductByID)
 
-	app.Get("/me", Me)
+	app.Get("/me", authMiddleware.RequireAuth, Me)
 
 	admin := app.Group("/admin")
-	admin.Post("/products", productHandler.CreateProduct)
-	admin.Delete("/products/:id", productHandler.DeleteProduct)
+	admin.Post("/products", productHandler.CreateProduct, authMiddleware.RequireAuth, authMiddleware.RequireAdmin)
+	admin.Delete("/products/:id", productHandler.DeleteProduct, authMiddleware.RequireAuth, authMiddleware.RequireAdmin)
 }
