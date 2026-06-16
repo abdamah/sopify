@@ -34,11 +34,13 @@ func main() {
 
 	productRepo := repository.NewProductRepository(db)
 	userRepo := repository.NewUserRepository(db)
+	cartRepo := repository.NewCartRepository(db)
 	authMiddleware := middleware.NewAuthMiddleware(jwtService, userRepo)
 	productHandler := handlers.NewProductHandler(productRepo)
 	authHandler := handlers.NewAuthHandler(userRepo, jwtService)
+	cartHandler := handlers.NewCartHandler(cartRepo, productRepo)
 
-	handlers.RegisterRoutes(app, productHandler, authHandler, authMiddleware)
+	handlers.RegisterRoutes(app, productHandler, authHandler, cartHandler, authMiddleware)
 
 	log.Printf("[api] listening on :%s", cfg.Port)
 	log.Fatal(app.Listen(":"+cfg.Port, fiber.ListenConfig{

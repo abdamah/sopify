@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/abdamah/dailykode/sopify/backend/internal/auth"
+	"github.com/abdamah/dailykode/sopify/backend/internal/middleware"
 	"github.com/abdamah/dailykode/sopify/backend/internal/models"
 	"github.com/abdamah/dailykode/sopify/backend/internal/repository"
 	"github.com/gofiber/fiber/v3"
@@ -157,6 +158,24 @@ func (h *AuthHandler) Login(c fiber.Ctx) error {
 		Token: token,
 		User:  *user,
 	})
+}
+
+func (h *AuthHandler) Logout(c fiber.Ctx) error {
+	user, ok := middleware.UserFromContext(c)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "unauthorized",
+		})
+	}
+
+	if err := h.userRepo.ClearToken(c.Context(), user.ID); err != nil {
+		log.Printf("[api] clear token for user %s: %v", user.ID, err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "failed to logout",
+		})
+	}
+
+	return c.SendStatus(fiber.StatusNoContent)
 }
 
 func validateAuthInput(email, password string) string {

@@ -53,6 +53,14 @@ var sampleProducts = []seedProduct{
 }
 
 func seed(ctx context.Context, db *sql.DB) error {
+	if err := seedProducts(ctx, db); err != nil {
+		return err
+	}
+
+	return seedAdmin(ctx, db)
+}
+
+func seedProducts(ctx context.Context, db *sql.DB) error {
 	var count int
 	if err := db.QueryRowContext(ctx, `SELECT COUNT(*) FROM products`).Scan(&count); err != nil {
 		return fmt.Errorf("count products: %w", err)
