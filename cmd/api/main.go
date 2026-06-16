@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime)
+
 	cfg, err := config.Load()
 	if err != nil {
 		log.Fatal(err)
@@ -24,12 +26,15 @@ func main() {
 	defer db.Close()
 
 	app := fiber.New()
+	middleware.SetupLogger(app)
 	middleware.SetupCORS(app)
 
 	productRepo := repository.NewProductRepository(db)
 	productHandler := handlers.NewProductHandler(productRepo)
 	handlers.RegisterRoutes(app, productHandler)
 
-	log.Printf("Sopify API listening on :%s", cfg.Port)
-	log.Fatal(app.Listen(":" + cfg.Port))
+	log.Printf("[api] listening on :%s", cfg.Port)
+	log.Fatal(app.Listen(":"+cfg.Port, fiber.ListenConfig{
+		DisableStartupMessage: true,
+	}))
 }
