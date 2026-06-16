@@ -13,5 +13,6 @@ seed:
 
 migrate:
 	psql "$(DATABASE_URL)" -f migrations/001_create_products.sql
+	psql "$(DATABASE_URL)" -f migrations/002_create_users.sql
 
 setup: migrate seed

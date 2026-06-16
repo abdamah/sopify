@@ -8,8 +8,10 @@ import (
 )
 
 type Config struct {
-	Port        string
-	DatabaseURL string
+	Port         string
+	DatabaseURL  string
+	ClerkJWKSURL string
+	ClerkIssuer  string
 }
 
 func Load() (*Config, error) {
@@ -25,8 +27,13 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("DATABASE_URL is required")
 	}
 
+	clerkJWKSURL := os.Getenv("CLERK_JWKS_URL")
+	clerkIssuer := os.Getenv("CLERK_ISSUER")
+
 	return &Config{
-		Port:        port,
-		DatabaseURL: databaseURL,
+		Port:         port,
+		DatabaseURL:  databaseURL,
+		ClerkJWKSURL: clerkJWKSURL,
+		ClerkIssuer:  clerkIssuer,
 	}, nil
 }
