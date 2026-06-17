@@ -55,8 +55,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #f97315;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -66,7 +66,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: #f97315;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -75,12 +75,12 @@
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: #f97315;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: oklch(0.97 0 0);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: #f97315;
 }
 
 .dark {
@@ -90,8 +90,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: #f97315;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -101,7 +101,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: #f97315;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -109,22 +109,100 @@
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-primary: #f97315;
+  --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: #f97315;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+
   html {
     @apply font-sans;
   }
+
+  body {
+    @apply min-h-full bg-background text-foreground;
+  }
+}
+
+@utility page-container {
+  @apply mx-auto w-full max-w-6xl flex-1 px-4 py-8;
+}
+
+@utility page-container-sm {
+  @apply mx-auto w-full max-w-4xl flex-1 px-4 py-8;
+}
+
+@utility page-title {
+  @apply text-3xl font-semibold tracking-tight;
+}
+
+@utility page-center {
+  @apply flex flex-1 flex-col items-center justify-center gap-4;
+}
+
+@utility header-inner {
+  @apply mx-auto flex h-14 max-w-6xl items-center gap-6 px-4;
+}
+
+@utility nav-link {
+  @apply text-sm text-muted-foreground transition-colors hover:text-foreground;
+}
+
+@utility primary-button {
+  @apply rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90;
+}
+
+@utility product-grid {
+  @apply grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+@utility muted-text {
+  @apply text-muted-foreground;
+}
+
+@utility price-lg {
+  @apply text-lg font-semibold;
+}
+
+@utility price-xl {
+  @apply text-2xl font-semibold;
+}
+
+@utility product-image {
+  @apply aspect-square w-full object-cover;
+}
+
+@utility product-image-lg {
+  @apply aspect-square w-full rounded-xl object-cover ring-1 ring-foreground/10;
+}
+
+@utility product-card {
+  @apply h-full gap-0 py-0 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-primary/25;
+}
+
+@utility product-card-image {
+  @apply aspect-square w-full bg-muted object-cover transition-transform duration-300 group-hover:scale-105;
+}
+
+@utility product-card-body {
+  @apply flex flex-1 flex-col gap-3 p-4;
+}
+
+@utility product-card-title {
+  @apply line-clamp-2 text-base font-semibold leading-snug transition-colors group-hover:text-primary;
+}
+
+@utility stock-badge {
+  @apply rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary;
+}
+
+@utility stock-badge-empty {
+  @apply rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground;
 }
