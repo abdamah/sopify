@@ -1,21 +1,11 @@
-# Sopify Backend
+# Sopify
 
-Go + Fiber v3 API.
+Simple ecommerce app — Go/Fiber v3 backend + Next.js frontend.
 
-**Module:** `github.com/abdamah/dailykode/sopify/backend`  
-**Requires:** Go 1.25+ (Fiber v3)
-
-## Run
-
-```bash
-go run ./cmd/api
-curl http://localhost:8080/health
+```
+sopify/
+├── backend/    # Go + Fiber v3  (github.com/abdamah/dailykode/sopify/backend)
+└── frontend/   # Next.js + Clerk
 ```
 
-Expected:
-
-```json
-{"app":"sopify","status":"ok"}
-```
-
-See [backend_plan.md](backend_plan.md) for phased build plan.
+See [sopif_course_plan.md](../sopif_course_plan.md) and [backend/backend_plan.md](backend/backend_plan.md).

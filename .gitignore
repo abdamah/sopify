@@ -3,22 +3,25 @@
 .env.local
 .env.*.local
 
-# Go build artifacts
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-/bin/
-/dist/
-/api
+# Go (backend)
+backend/bin/
+backend/dist/
+backend/*.exe
+backend/*.test
+backend/coverage.out
+backend/coverage.txt
 
-# Test & coverage
-*.test
-*.out
-coverage.out
-coverage.txt
-coverage.html
+# Next.js (frontend)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel/
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+
+# Dependencies
+node_modules/
 
 # IDE / OS
 .idea/
@@ -30,6 +33,9 @@ Thumbs.db
 
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Debug
 __debug_bin

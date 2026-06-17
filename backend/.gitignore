@@ -1,0 +1,35 @@
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/bin/
+/dist/
+/api
+
+# Test & coverage
+*.test
+*.out
+coverage.out
+coverage.txt
+coverage.html
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Debug
+__debug_bin
