@@ -172,7 +172,7 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 2.1 — `lib/types.ts`
 
-- [ ] Define `Product` type matching Go API
+- [x] Define `Product` type matching Go API
 
 **Done when:** TypeScript knows the product shape; no UI yet.
 
@@ -180,10 +180,10 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 2.2 — `lib/api.ts`
 
-- [ ] Install `server-only`
-- [ ] Create fetch helper using `NEXT_PUBLIC_API_URL`
-- [ ] Support optional `token` for later auth
-- [ ] `cache: "no-store"` for fresh data
+- [x] Install `server-only`
+- [x] Create fetch helper using `NEXT_PUBLIC_API_URL`
+- [x] Support optional `token` for later auth
+- [x] `cache: "no-store"` for fresh data
 
 **Done when:** `api("/products")` works from a server file.
 
@@ -191,9 +191,9 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 2.3 — `actions/products.ts`
 
-- [ ] `"use server"`
-- [ ] `getProducts()` → `GET /products`
-- [ ] `getProductById(id)` → `GET /products/:id` (return `null` on 404)
+- [x] `"use server"`
+- [x] `getProducts()` → `GET /products`
+- [x] `getProductById(id)` → `GET /products/:id` (return `null` on 404)
 
 **Done when:** Actions return real product data from Go API.
 
@@ -201,7 +201,7 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 2.4 — `next.config.ts`
 
-- [ ] Add `images.remotePatterns` for `placehold.co` (seed images)
+- [x] Add `images.remotePatterns` for `placehold.co` (seed images)
 
 **Done when:** Next.js `<Image>` accepts product image URLs.
 
@@ -209,8 +209,8 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 2.5 — `components/product-card.tsx`
 
-- [ ] Add shadcn `card`: `npx shadcn@latest add card`
-- [ ] Image, name, price, link to `/products/[id]`
+- [x] Add shadcn `card`: `npx shadcn@latest add card`
+- [x] Image, name, price, link to `/products/[id]`
 
 **Done when:** Card renders with hardcoded or real product props.
 
@@ -218,8 +218,8 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 2.6 — `app/products/page.tsx`
 
-- [ ] Server Component calls `getProducts()`
-- [ ] Grid of `ProductCard` components
+- [x] Server Component calls `getProducts()`
+- [x] Grid of `ProductCard` components
 
 **Done when:** `http://localhost:3000/products` shows API products.
 
@@ -227,9 +227,9 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 2.7 — `app/products/[id]/page.tsx`
 
-- [ ] Server Component calls `getProductById(id)`
-- [ ] `notFound()` if missing
-- [ ] Image, name, description, price, stock
+- [x] Server Component calls `getProductById(id)`
+- [x] `notFound()` if missing
+- [x] Image, name, description, price, stock
 
 **Done when:** Clicking a product opens detail page.
 
@@ -237,8 +237,8 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 2.8 — Header / nav (optional)
 
-- [ ] `components/header.tsx` — Sopify title, link to `/products`
-- [ ] Wire into `app/layout.tsx`
+- [x] `components/header.tsx` — Sopify title, link to `/products`
+- [x] Wire into `app/layout.tsx`
 
 **Done when:** Navigate to products from any page.
 
@@ -425,7 +425,7 @@ cd frontend && npm run dev
 | Phase | Status |
 |-------|--------|
 | 1 — Setup | Done |
-| 2 — Products | In progress (2.1+) |
+| 2 — Products | Done |
 | 3 — Auth | Not started |
 | 4 — Cart | Not started |
 | 5 — Polish | Not started |
