@@ -320,25 +320,25 @@ All pass token from cookie.
 
 ### 4.3 — Add to cart (product detail)
 
-- [ ] Client component on product detail page
-- [ ] Quantity input (default 1)
-- [ ] Button calls `addToCart` action
-- [ ] Redirect to login if not authenticated (or show message)
+- [x] Client component on product detail page
+- [x] Quantity input (default 1)
+- [x] Button calls `addToCart` action
+- [x] Redirect to login if not authenticated (or show message)
 
 ---
 
 ### 4.4 — Cart page
 
-- [ ] `app/cart/page.tsx` — list items, line totals, cart total
-- [ ] Remove button per item
-- [ ] Empty state when cart is empty
-- [ ] Protect page: redirect to login if not authenticated
+- [x] `app/cart/page.tsx` — list items, line totals, cart total
+- [x] Remove button per item
+- [x] Empty state when cart is empty
+- [x] Protect page: redirect to login if not authenticated
 
 ---
 
 ### 4.5 — Header cart link
 
-- [ ] Link to `/cart` in header (visible when logged in)
+- [x] Link to `/cart` in header (visible when logged in)
 
 **Done when:** Full cart flow works against Go API.
 

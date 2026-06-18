@@ -362,3 +362,27 @@
 @utility form-error {
   @apply rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700;
 }
+
+@utility cart-grid {
+  @apply grid gap-10 py-12 lg:grid-cols-[1fr_360px];
+}
+
+@utility cart-section-title {
+  @apply mb-5 border-b border-border pb-3 text-lg font-bold text-foreground;
+}
+
+@utility cart-item-row {
+  @apply flex items-center gap-4 border-b border-border py-4;
+}
+
+@utility cart-item-image {
+  @apply size-16 shrink-0 rounded-md border border-border bg-secondary object-cover;
+}
+
+@utility cart-summary {
+  @apply rounded-2xl border border-border bg-muted p-6;
+}
+
+@utility summary-row {
+  @apply flex items-center justify-between py-2 text-sm text-muted-foreground;
+}
