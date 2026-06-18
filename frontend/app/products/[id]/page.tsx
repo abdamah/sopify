@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getProductById } from "@/actions/products";
+import { AddToCartForm } from "@/components/add-to-cart-form";
 import { getProductImageUrl } from "@/lib/utils";
 
 function formatPrice(price: number) {
@@ -34,6 +35,7 @@ export default async function ProductDetailPage({
           height={600}
           className="product-image-lg"
           priority
+          unoptimized
         />
 
         <div className="pt-2">
@@ -55,27 +57,8 @@ export default async function ProductDetailPage({
               : "Currently out of stock"}
           </p>
 
-          <div className="mb-5">
-            <p className="mb-2 text-[13px] font-medium text-muted-foreground">
-              Quantity
-            </p>
-            <div className="inline-flex overflow-hidden rounded-md border border-border">
-              <button className="size-10 bg-muted text-lg font-semibold text-foreground">
-                -
-              </button>
-              <span className="grid h-10 w-14 place-items-center border-x border-border text-sm font-semibold">
-                1
-              </span>
-              <button className="size-10 bg-muted text-lg font-semibold text-foreground">
-                +
-              </button>
-            </div>
-          </div>
-
           <div className="flex flex-wrap gap-3">
-            <button className="primary-button min-w-40 flex-1" disabled={product.stock <= 0}>
-              Add to cart
-            </button>
+            <AddToCartForm productId={product.id} stock={product.stock} />
             <Link href="/products" className="secondary-button">
               Back to shop
             </Link>

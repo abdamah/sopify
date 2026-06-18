@@ -1,7 +1,16 @@
 import { Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
-export function Header() {
+import { getMe } from "@/actions/auth";
+import { getCart } from "@/actions/cart";
+import { LogoutButton } from "@/components/logout-button";
+
+export async function Header() {
+  const user = await getMe().catch(() => null);
+  const cart = user ? await getCart().catch(() => null) : null;
+  const cartCount =
+    cart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
       <div className="header-inner">
@@ -23,13 +32,34 @@ export function Header() {
             <input className="header-search" placeholder="Search products" />
           </label>
 
-          <Link href="/cart" className="icon-button" aria-label="Cart">
-            <ShoppingCart className="size-5" aria-hidden="true" />
-          </Link>
+          {user ? (
+            <Link href="/cart" className="icon-button relative" aria-label="Cart">
+              <ShoppingCart className="size-5" aria-hidden="true" />
+              {cartCount > 0 ? (
+                <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-primary text-[10px] font-bold leading-none text-primary-foreground">
+                  {cartCount}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
 
-          <Link href="/login" className="secondary-button hidden px-3 py-1.5 text-[13px] sm:inline-flex">
-            Sign in
-          </Link>
+          {user ? (
+            <div className="hidden items-center gap-2 sm:flex">
+              <span className="max-w-40 truncate rounded-full border border-border px-3 py-1.5 text-[13px] font-medium text-foreground">
+                {user.email}
+              </span>
+              <LogoutButton />
+            </div>
+          ) : (
+            <div className="hidden items-center gap-2 sm:flex">
+              <Link href="/login" className="secondary-button px-3 py-1.5 text-[13px]">
+                Sign in
+              </Link>
+              <Link href="/register" className="primary-button px-3 py-1.5 text-[13px]">
+                Register
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>

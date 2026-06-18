@@ -250,49 +250,49 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 3.1 — Types
 
-- [ ] Add `User`, `AuthResponse` to `lib/types.ts`
+- [x] Add `User`, `AuthResponse` to `lib/types.ts`
 
 ---
 
 ### 3.2 — `lib/auth.ts` (cookie helpers)
 
-- [ ] `getToken()` — read cookie
-- [ ] `setToken(token)` — set httpOnly cookie
-- [ ] `clearToken()` — delete cookie
-- [ ] Cookie name: `sopify_token`
+- [x] `getToken()` — read cookie
+- [x] `setToken(token)` — set httpOnly cookie
+- [x] `clearToken()` — delete cookie
+- [x] Cookie name: `sopify_token`
 
 ---
 
 ### 3.3 — `actions/auth.ts`
 
-- [ ] `register(email, password)` → `POST /auth/register` → set cookie
-- [ ] `login(email, password)` → `POST /auth/login` → set cookie
-- [ ] `logout()` → `POST /auth/logout` with token → clear cookie
-- [ ] `getMe()` → `GET /me` with token (return `null` if not logged in)
+- [x] `register(email, password)` → `POST /auth/register` → set cookie
+- [x] `login(email, password)` → `POST /auth/login` → set cookie
+- [x] `logout()` → `POST /auth/logout` with token → clear cookie
+- [x] `getMe()` → `GET /me` with token (return `null` if not logged in)
 
 ---
 
 ### 3.4 — Login page
 
-- [ ] Add shadcn `input`, `label`
-- [ ] `app/login/page.tsx` + `components/login-form.tsx` (client)
-- [ ] Form calls `login` action, redirect to `/products` on success
-- [ ] Show error message on failure
+- [x] Add Tailwind `input`, `label`
+- [x] `app/login/page.tsx` + `components/login-form.tsx` (client)
+- [x] Form calls `login` action, redirect to `/products` on success
+- [x] Show error message on failure
 
 ---
 
 ### 3.5 — Register page
 
-- [ ] `app/register/page.tsx` + `components/register-form.tsx`
-- [ ] Form calls `register` action, redirect on success
+- [x] `app/register/page.tsx` + `components/register-form.tsx`
+- [x] Form calls `register` action, redirect on success
 
 ---
 
 ### 3.6 — Header auth state
 
-- [ ] Show Login / Register when logged out
-- [ ] Show email + Logout when logged in
-- [ ] Logout button calls `logout` action
+- [x] Show Login / Register when logged out
+- [x] Show email + Logout when logged in
+- [x] Logout button calls `logout` action
 
 **Done when:** Can register, login, see `/me` data in header, logout invalidates session.
 
@@ -304,15 +304,15 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 4.1 — Types
 
-- [ ] Add `CartItem`, `CartResponse` to `lib/types.ts`
+- [x] Add `CartItem`, `CartResponse` to `lib/types.ts`
 
 ---
 
 ### 4.2 — `actions/cart.ts`
 
-- [ ] `getCart()` → `GET /cart`
-- [ ] `addToCart(productId, quantity)` → `POST /cart`
-- [ ] `removeFromCart(productId)` → `DELETE /cart/:product_id`
+- [x] `getCart()` → `GET /cart`
+- [x] `addToCart(productId, quantity)` → `POST /cart`
+- [x] `removeFromCart(productId)` → `DELETE /cart/:product_id`
 
 All pass token from cookie.
 
@@ -320,25 +320,25 @@ All pass token from cookie.
 
 ### 4.3 — Add to cart (product detail)
 
-- [ ] Client component on product detail page
-- [ ] Quantity input (default 1)
-- [ ] Button calls `addToCart` action
-- [ ] Redirect to login if not authenticated (or show message)
+- [x] Client component on product detail page
+- [x] Quantity input (default 1)
+- [x] Button calls `addToCart` action
+- [x] Redirect to login if not authenticated (or show message)
 
 ---
 
 ### 4.4 — Cart page
 
-- [ ] `app/cart/page.tsx` — list items, line totals, cart total
-- [ ] Remove button per item
-- [ ] Empty state when cart is empty
-- [ ] Protect page: redirect to login if not authenticated
+- [x] `app/cart/page.tsx` — list items, line totals, cart total
+- [x] Remove button per item
+- [x] Empty state when cart is empty
+- [x] Protect page: redirect to login if not authenticated
 
 ---
 
 ### 4.5 — Header cart link
 
-- [ ] Link to `/cart` in header (visible when logged in)
+- [x] Link to `/cart` in header (visible when logged in)
 
 **Done when:** Full cart flow works against Go API.
 
