@@ -274,25 +274,25 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 3.4 — Login page
 
-- [ ] Add shadcn `input`, `label`
-- [ ] `app/login/page.tsx` + `components/login-form.tsx` (client)
-- [ ] Form calls `login` action, redirect to `/products` on success
-- [ ] Show error message on failure
+- [x] Add Tailwind `input`, `label`
+- [x] `app/login/page.tsx` + `components/login-form.tsx` (client)
+- [x] Form calls `login` action, redirect to `/products` on success
+- [x] Show error message on failure
 
 ---
 
 ### 3.5 — Register page
 
-- [ ] `app/register/page.tsx` + `components/register-form.tsx`
-- [ ] Form calls `register` action, redirect on success
+- [x] `app/register/page.tsx` + `components/register-form.tsx`
+- [x] Form calls `register` action, redirect on success
 
 ---
 
 ### 3.6 — Header auth state
 
-- [ ] Show Login / Register when logged out
-- [ ] Show email + Logout when logged in
-- [ ] Logout button calls `logout` action
+- [x] Show Login / Register when logged out
+- [x] Show email + Logout when logged in
+- [x] Logout button calls `logout` action
 
 **Done when:** Can register, login, see `/me` data in header, logout invalidates session.
 

@@ -11,37 +11,54 @@ type AuthInput = {
   password: string;
 };
 
+type AuthActionResult =
+  | { ok: true; user: User }
+  | { ok: false; error: string };
+
+function getApiErrorMessage(error: unknown, fallback: string) {
+  if (axios.isAxiosError<{ error?: string }>(error)) {
+    return error.response?.data?.error ?? fallback;
+  }
+
+  return fallback;
+}
+
 export async function register(
   email: string,
   password: string
-): Promise<AuthResponse> {
-  const input:AuthInput = {
-    email,
-    password,
-  };
-  const auth = await api.post<AuthResponse>("/auth/register", {
- input,
-  } );
+): Promise<AuthActionResult> {
+  try {
+    const input: AuthInput = { email, password };
+    const auth = await api.post<AuthResponse>("/auth/register", input);
 
-  await setToken(auth.token);
+    await setToken(auth.token);
 
-  return auth;
+    return { ok: true, user: auth.user };
+  } catch (error) {
+    return {
+      ok: false,
+      error: getApiErrorMessage(error, "Failed to register"),
+    };
+  }
 }
 
 export async function login(
   email: string,
   password: string
-): Promise<AuthResponse> {
+): Promise<AuthActionResult> {
+  try {
+    const input: AuthInput = { email, password };
+    const auth = await api.post<AuthResponse>("/auth/login", input);
 
-  const input:AuthInput = {
-    email,
-    password,
-  };
-  const auth = await api.post<AuthResponse>("/auth/login", input);
+    await setToken(auth.token);
 
-  await setToken(auth.token);
-
-  return auth;
+    return { ok: true, user: auth.user };
+  } catch (error) {
+    return {
+      ok: false,
+      error: getApiErrorMessage(error, "Failed to login"),
+    };
+  }
 }
 
 export async function logout(): Promise<void> {

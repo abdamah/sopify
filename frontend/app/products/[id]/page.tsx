@@ -34,6 +34,7 @@ export default async function ProductDetailPage({
           height={600}
           className="product-image-lg"
           priority
+          unoptimized
         />
 
         <div className="pt-2">

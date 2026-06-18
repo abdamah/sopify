@@ -1,7 +1,12 @@
 import { Search, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 
-export function Header() {
+import { getMe } from "@/actions/auth";
+import { LogoutButton } from "@/components/logout-button";
+
+export async function Header() {
+  const user = await getMe().catch(() => null);
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
       <div className="header-inner">
@@ -27,9 +32,23 @@ export function Header() {
             <ShoppingCart className="size-5" aria-hidden="true" />
           </Link>
 
-          <Link href="/login" className="secondary-button hidden px-3 py-1.5 text-[13px] sm:inline-flex">
-            Sign in
-          </Link>
+          {user ? (
+            <div className="hidden items-center gap-2 sm:flex">
+              <span className="max-w-40 truncate rounded-full border border-border px-3 py-1.5 text-[13px] font-medium text-foreground">
+                {user.email}
+              </span>
+              <LogoutButton />
+            </div>
+          ) : (
+            <div className="hidden items-center gap-2 sm:flex">
+              <Link href="/login" className="secondary-button px-3 py-1.5 text-[13px]">
+                Sign in
+              </Link>
+              <Link href="/register" className="primary-button px-3 py-1.5 text-[13px]">
+                Register
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>

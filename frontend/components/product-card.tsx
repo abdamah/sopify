@@ -24,6 +24,7 @@ export function ProductCard({ product }: { product: Product }) {
             width={400}
             height={400}
             className="product-card-image"
+            unoptimized
           />
           <span
             className={`absolute right-2.5 top-2.5 ${
