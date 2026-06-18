@@ -304,15 +304,15 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 4.1 — Types
 
-- [ ] Add `CartItem`, `CartResponse` to `lib/types.ts`
+- [x] Add `CartItem`, `CartResponse` to `lib/types.ts`
 
 ---
 
 ### 4.2 — `actions/cart.ts`
 
-- [ ] `getCart()` → `GET /cart`
-- [ ] `addToCart(productId, quantity)` → `POST /cart`
-- [ ] `removeFromCart(productId)` → `DELETE /cart/:product_id`
+- [x] `getCart()` → `GET /cart`
+- [x] `addToCart(productId, quantity)` → `POST /cart`
+- [x] `removeFromCart(productId)` → `DELETE /cart/:product_id`
 
 All pass token from cookie.
 

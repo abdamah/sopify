@@ -22,3 +22,15 @@ export type AuthResponse = {
   token: string;
   user: User;
 };
+
+export type CartItem = {
+  id: string;
+  quantity: number;
+  product: Product;
+  line_total: number;
+};
+
+export type CartResponse = {
+  items: CartItem[];
+  total: number;
+};
