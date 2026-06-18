@@ -8,3 +8,17 @@ export type Product = {
   created_at: string;
   updated_at: string;
 };
+
+export type User = {
+  id: string;
+  email: string;
+  role: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AuthResponse = {
+  token: string;
+  user: User;
+};

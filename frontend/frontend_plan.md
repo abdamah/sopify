@@ -250,16 +250,16 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 3.1 — Types
 
-- [ ] Add `User`, `AuthResponse` to `lib/types.ts`
+- [x] Add `User`, `AuthResponse` to `lib/types.ts`
 
 ---
 
 ### 3.2 — `lib/auth.ts` (cookie helpers)
 
-- [ ] `getToken()` — read cookie
-- [ ] `setToken(token)` — set httpOnly cookie
-- [ ] `clearToken()` — delete cookie
-- [ ] Cookie name: `sopify_token`
+- [x] `getToken()` — read cookie
+- [x] `setToken(token)` — set httpOnly cookie
+- [x] `clearToken()` — delete cookie
+- [x] Cookie name: `sopify_token`
 
 ---
 
