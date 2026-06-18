@@ -265,10 +265,10 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ### 3.3 — `actions/auth.ts`
 
-- [ ] `register(email, password)` → `POST /auth/register` → set cookie
-- [ ] `login(email, password)` → `POST /auth/login` → set cookie
-- [ ] `logout()` → `POST /auth/logout` with token → clear cookie
-- [ ] `getMe()` → `GET /me` with token (return `null` if not logged in)
+- [x] `register(email, password)` → `POST /auth/register` → set cookie
+- [x] `login(email, password)` → `POST /auth/login` → set cookie
+- [x] `logout()` → `POST /auth/logout` with token → clear cookie
+- [x] `getMe()` → `GET /me` with token (return `null` if not logged in)
 
 ---
 
