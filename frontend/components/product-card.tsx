@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Card, CardContent } from "@/components/ui/card";
 import type { Product } from "@/lib/types";
 import { getProductImageUrl } from "@/lib/utils";
 
@@ -17,8 +16,8 @@ export function ProductCard({ product }: { product: Product }) {
 
   return (
     <Link href={`/products/${product.id}`} className="group block h-full">
-      <Card className="product-card">
-        <div className="overflow-hidden">
+      <article className="product-card">
+        <div className="relative overflow-hidden">
           <Image
             src={getProductImageUrl(product.image_url)}
             alt={product.name}
@@ -26,21 +25,24 @@ export function ProductCard({ product }: { product: Product }) {
             height={400}
             className="product-card-image"
           />
+          <span
+            className={`absolute right-2.5 top-2.5 ${
+              isInStock ? "stock-badge" : "stock-badge-empty"
+            }`}
+          >
+            {isInStock ? "In stock" : "Out"}
+          </span>
         </div>
 
-        <CardContent className="product-card-body">
-          <div className="flex items-start justify-between gap-3">
-            <h2 className="product-card-title">{product.name}</h2>
-            <p className="price-lg shrink-0">{formatPrice(product.price)}</p>
-          </div>
+        <div className="product-card-body">
+          <h2 className="product-card-title">{product.name}</h2>
+          <p className="mb-3 text-base font-bold text-primary">
+            {formatPrice(product.price)}
+          </p>
 
-          <div className="mt-auto">
-            <span className={isInStock ? "stock-badge" : "stock-badge-empty"}>
-              {isInStock ? `${product.stock} in stock` : "Out of stock"}
-            </span>
-          </div>
-        </CardContent>
-      </Card>
+          <p className="primary-button w-full py-2 text-[13px]">View product</p>
+        </div>
+      </article>
     </Link>
   );
 }

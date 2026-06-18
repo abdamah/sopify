@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { getProductById } from "@/actions/products";
@@ -25,7 +26,7 @@ export default async function ProductDetailPage({
 
   return (
     <main className="page-container-sm">
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="detail-grid">
         <Image
           src={getProductImageUrl(product.image_url)}
           alt={product.name}
@@ -35,15 +36,50 @@ export default async function ProductDetailPage({
           priority
         />
 
-        <div className="flex flex-col gap-4">
-          <h1 className="page-title">{product.name}</h1>
-          <p className="price-xl">{formatPrice(product.price)}</p>
-          <p className="muted-text">{product.description}</p>
-          <p className="text-sm muted-text">
+        <div className="pt-2">
+          <div className="breadcrumb">
+            <Link href="/products" className="text-muted-foreground hover:text-primary">
+              Shop
+            </Link>
+            <span>/</span>
+            <span>{product.name}</span>
+          </div>
+
+          <h1 className="detail-title">{product.name}</h1>
+          <p className="detail-price">{formatPrice(product.price)}</p>
+          <p className="detail-desc">{product.description}</p>
+
+          <p className="detail-stock">
             {product.stock > 0
-              ? `${product.stock} in stock`
-              : "Out of stock"}
+              ? `Available: ${product.stock} in stock`
+              : "Currently out of stock"}
           </p>
+
+          <div className="mb-5">
+            <p className="mb-2 text-[13px] font-medium text-muted-foreground">
+              Quantity
+            </p>
+            <div className="inline-flex overflow-hidden rounded-md border border-border">
+              <button className="size-10 bg-muted text-lg font-semibold text-foreground">
+                -
+              </button>
+              <span className="grid h-10 w-14 place-items-center border-x border-border text-sm font-semibold">
+                1
+              </span>
+              <button className="size-10 bg-muted text-lg font-semibold text-foreground">
+                +
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <button className="primary-button min-w-40 flex-1" disabled={product.stock <= 0}>
+              Add to cart
+            </button>
+            <Link href="/products" className="secondary-button">
+              Back to shop
+            </Link>
+          </div>
         </div>
       </div>
     </main>
