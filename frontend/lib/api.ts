@@ -43,7 +43,13 @@ export const api = {
     return res.data;
   },
 
+  async patch<T>(path: string, body?: unknown, token?: string): Promise<T> {
+    const res = await axios.patch<T>(`${getBaseUrl()}${path}`, body, {
+      headers: getHeaders(token),
+    });
 
+    return res.data;
+  },
 
   async delete<T>(path: string, token?: string): Promise<T> {
     const res = await axios.delete<T>(`${getBaseUrl()}${path}`, {

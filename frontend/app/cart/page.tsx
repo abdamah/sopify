@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { getMe } from "@/actions/auth";
 import { getCart } from "@/actions/cart";
+import { CartQuantityControls } from "@/components/cart-quantity-controls";
 import { RemoveCartItemButton } from "@/components/remove-cart-item-button";
 import { getProductImageUrl } from "@/lib/utils";
 
@@ -59,8 +60,13 @@ export default async function CartPage() {
                     <h3 className="truncate text-sm font-semibold">
                       {item.product.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground">
-                      Qty {item.quantity} x {formatPrice(item.product.price)}
+                    <CartQuantityControls
+                      productId={item.product.id}
+                      quantity={item.quantity}
+                      stock={item.product.stock}
+                    />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {formatPrice(item.product.price)} each
                     </p>
                   </div>
 
