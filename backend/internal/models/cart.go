@@ -16,3 +16,7 @@ type AddCartItemInput struct {
 	ProductID string `json:"product_id"`
 	Quantity  int    `json:"quantity"`
 }
+
+type UpdateCartItemInput struct {
+	Quantity int `json:"quantity"`
+}

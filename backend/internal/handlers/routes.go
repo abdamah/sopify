@@ -17,6 +17,7 @@ func RegisterRoutes(app *fiber.App, productHandler *ProductHandler, authHandler 
 	app.Get("/me", authMiddleware.RequireAuth, Me)
 	app.Get("/cart", authMiddleware.RequireAuth, cartHandler.GetCart)
 	app.Post("/cart", authMiddleware.RequireAuth, cartHandler.AddItem)
+	app.Patch("/cart/:product_id", authMiddleware.RequireAuth, cartHandler.UpdateItem)
 	app.Delete("/cart/:product_id", authMiddleware.RequireAuth, cartHandler.RemoveItem)
 
 	admin := app.Group("/admin", authMiddleware.RequireAuth, authMiddleware.RequireAdmin)

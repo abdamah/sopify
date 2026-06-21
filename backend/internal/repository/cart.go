@@ -93,6 +93,28 @@ func (r *CartRepository) AddItem(ctx context.Context, userID, productID string, 
 	return err
 }
 
+func (r *CartRepository) UpdateItemQuantity(ctx context.Context, userID, productID string, quantity int) error {
+	result, err := r.db.ExecContext(ctx, `
+		UPDATE cart_items
+		SET quantity = $3,
+		    updated_at = NOW()
+		WHERE user_id = $1 AND product_id = $2
+	`, userID, productID, quantity)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrCartItemNotFound
+	}
+
+	return nil
+}
+
 func (r *CartRepository) DeleteItem(ctx context.Context, userID, productID string) error {
 	result, err := r.db.ExecContext(ctx, `
 		DELETE FROM cart_items
