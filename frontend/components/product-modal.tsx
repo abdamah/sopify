@@ -3,24 +3,27 @@
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState, useTransition } from "react";
 
-import { createProduct } from "@/actions/admin";
+import { createProduct, updateProduct } from "@/actions/admin";
 import type { Product } from "@/lib/types";
 import { createProductSchema } from "@/lib/validation";
 
-type CreateProductModalProps = {
+type ProductModalProps = {
   open: boolean;
+  product?: Product | null;
   onClose: () => void;
   onSuccess: (product: Product) => void;
 };
 
-export function CreateProductModal({
+export function ProductModal({
   open,
+  product,
   onClose,
   onSuccess,
-}: CreateProductModalProps) {
+}: ProductModalProps) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  const isEditing = Boolean(product);
 
   useEffect(() => {
     if (!open) {
@@ -53,7 +56,9 @@ export function CreateProductModal({
     const form = event.currentTarget;
 
     startTransition(async () => {
-      const result = await createProduct(parsed.data);
+      const result = isEditing
+        ? await updateProduct(product!.id, parsed.data)
+        : await createProduct(parsed.data);
 
       if (!result.ok) {
         if (result.unauthenticated) {
@@ -92,7 +97,7 @@ export function CreateProductModal({
       >
         <div className="modal-header">
           <h2 id="modal-title" className="modal-title">
-            Add product
+            {isEditing ? "Edit product" : "Add product"}
           </h2>
           <button
             type="button"
@@ -105,7 +110,7 @@ export function CreateProductModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form key={product?.id ?? "new"} onSubmit={handleSubmit}>
           <div className="modal-body">
             {error ? <p className="form-error">{error}</p> : null}
 
@@ -119,6 +124,7 @@ export function CreateProductModal({
                 type="text"
                 className="form-input"
                 placeholder="e.g. Wireless Headphones"
+                defaultValue={product?.name ?? ""}
                 required
               />
             </div>
@@ -133,6 +139,7 @@ export function CreateProductModal({
                 rows={3}
                 className="form-input resize-y"
                 placeholder="Short product description…"
+                defaultValue={product?.description ?? ""}
               />
             </div>
 
@@ -149,6 +156,7 @@ export function CreateProductModal({
                   step="0.01"
                   className="form-input"
                   placeholder="0.00"
+                  defaultValue={product?.price ?? ""}
                   required
                 />
               </div>
@@ -165,6 +173,7 @@ export function CreateProductModal({
                   step="1"
                   className="form-input"
                   placeholder="0"
+                  defaultValue={product?.stock ?? ""}
                   required
                 />
               </div>
@@ -181,7 +190,13 @@ export function CreateProductModal({
               Cancel
             </button>
             <button type="submit" className="primary-button" disabled={isPending}>
-              {isPending ? "Saving..." : "Save product"}
+              {isPending
+                ? isEditing
+                  ? "Updating..."
+                  : "Saving..."
+                : isEditing
+                  ? "Update product"
+                  : "Save product"}
             </button>
           </div>
         </form>

@@ -471,6 +471,10 @@
   @apply inline-flex items-center gap-1 rounded-md border border-border bg-muted px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-secondary;
 }
 
+@utility admin-btn-edit {
+  @apply inline-flex items-center gap-1 rounded-md border border-border bg-muted px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-secondary disabled:opacity-50;
+}
+
 @utility admin-btn-delete {
   @apply inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:opacity-50;
 }

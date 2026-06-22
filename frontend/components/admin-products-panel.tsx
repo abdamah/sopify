@@ -2,11 +2,10 @@
 
 import { Search } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import { CreateProductModal } from "@/components/create-product-modal";
 import { DeleteProductButton } from "@/components/delete-product-button";
+import { ProductModal } from "@/components/product-modal";
 import type { Product } from "@/lib/types";
 import { getProductImageUrl } from "@/lib/utils";
 
@@ -42,6 +41,7 @@ export function AdminProductsPanel({
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -66,9 +66,31 @@ export function AdminProductsPanel({
     setCurrentPage(1);
   }
 
-  function handleProductCreated(product: Product) {
-    setProducts((current) => [product, ...current]);
+  function openCreateModal() {
+    setEditingProduct(null);
+    setIsModalOpen(true);
+  }
+
+  function openEditModal(product: Product) {
+    setEditingProduct(product);
+    setIsModalOpen(true);
+  }
+
+  function closeModal() {
     setIsModalOpen(false);
+    setEditingProduct(null);
+  }
+
+  function handleProductSaved(product: Product) {
+    setProducts((current) => {
+      const exists = current.some((item) => item.id === product.id);
+      if (exists) {
+        return current.map((item) => (item.id === product.id ? product : item));
+      }
+
+      return [product, ...current];
+    });
+    closeModal();
   }
 
   function handleProductDeleted(productId: string) {
@@ -103,7 +125,7 @@ export function AdminProductsPanel({
           <button
             type="button"
             className="primary-button"
-            onClick={() => setIsModalOpen(true)}
+            onClick={openCreateModal}
           >
             + Add product
           </button>
@@ -122,7 +144,7 @@ export function AdminProductsPanel({
           <button
             type="button"
             className="primary-button"
-            onClick={() => setIsModalOpen(true)}
+            onClick={openCreateModal}
           >
             + Add product
           </button>
@@ -171,12 +193,13 @@ export function AdminProductsPanel({
                   <td className="admin-table-td admin-td-id">#{product.id}</td>
                   <td className="admin-table-td">
                     <div className="admin-action-btns">
-                      <Link
-                        href={`/products/${product.id}`}
-                        className="admin-btn-view"
+                      <button
+                        type="button"
+                        className="admin-btn-edit"
+                        onClick={() => openEditModal(product)}
                       >
-                        View
-                      </Link>
+                        Edit
+                      </button>
                       <DeleteProductButton
                         productId={product.id}
                         productName={product.name}
@@ -229,10 +252,11 @@ export function AdminProductsPanel({
         </div>
       )}
 
-      <CreateProductModal
+      <ProductModal
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={handleProductCreated}
+        product={editingProduct}
+        onClose={closeModal}
+        onSuccess={handleProductSaved}
       />
     </div>
   );

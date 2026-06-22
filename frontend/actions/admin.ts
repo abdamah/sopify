@@ -7,7 +7,7 @@ import { getToken } from "@/lib/auth";
 import { api } from "@/lib/api";
 import type { CreateProductInput, Product } from "@/lib/types";
 
-type CreateProductResult =
+type AdminActionResult =
   | { ok: true; product: Product }
   | {
       ok: false;
@@ -36,7 +36,7 @@ function getApiErrorMessage(error: unknown, fallback: string) {
 function getAdminActionError(
   error: unknown,
   fallback: string
-): Extract<CreateProductResult, { ok: false }> {
+): Extract<AdminActionResult, { ok: false }> {
   if (axios.isAxiosError(error)) {
     if (error.response?.status === 401) {
       return {
@@ -63,7 +63,7 @@ function getAdminActionError(
 
 export async function createProduct(
   input: CreateProductInput
-): Promise<CreateProductResult> {
+): Promise<AdminActionResult> {
   const token = await getToken();
   if (!token) {
     return {
@@ -83,6 +83,37 @@ export async function createProduct(
     return { ok: true, product };
   } catch (error) {
     return getAdminActionError(error, "Failed to create product");
+  }
+}
+
+export async function updateProduct(
+  productId: string,
+  input: CreateProductInput
+): Promise<AdminActionResult> {
+  const token = await getToken();
+  if (!token) {
+    return {
+      ok: false,
+      error: "Please sign in to update products",
+      unauthenticated: true,
+    };
+  }
+
+  try {
+    const product = await api.patch<Product>(
+      `/admin/products/${productId}`,
+      input,
+      token
+    );
+
+    revalidatePath("/products");
+    revalidatePath(`/products/${productId}`);
+    revalidatePath("/admin");
+    revalidatePath("/", "layout");
+
+    return { ok: true, product };
+  } catch (error) {
+    return getAdminActionError(error, "Failed to update product");
   }
 }
 
