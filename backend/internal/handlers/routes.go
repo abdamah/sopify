@@ -22,5 +22,6 @@ func RegisterRoutes(app *fiber.App, productHandler *ProductHandler, authHandler 
 
 	admin := app.Group("/admin", authMiddleware.RequireAuth, authMiddleware.RequireAdmin)
 	admin.Post("/products", productHandler.CreateProduct)
+	admin.Patch("/products/:id", productHandler.UpdateProduct)
 	admin.Delete("/products/:id", productHandler.DeleteProduct)
 }

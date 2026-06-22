@@ -81,6 +81,44 @@ func (h *ProductHandler) CreateProduct(c fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(product)
 }
 
+func (h *ProductHandler) UpdateProduct(c fiber.Ctx) error {
+	id := c.Params("id")
+	if _, err := uuid.Parse(id); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid product id",
+		})
+	}
+
+	var input models.CreateProductInput
+	if err := c.Bind().Body(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid request body",
+		})
+	}
+
+	input.Name = strings.TrimSpace(input.Name)
+	if errMsg := validateCreateProductInput(input); errMsg != "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": errMsg,
+		})
+	}
+
+	product, err := h.repo.UpdateProduct(c.Context(), id, input)
+	if errors.Is(err, repository.ErrProductNotFound) {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "product not found",
+		})
+	}
+	if err != nil {
+		log.Printf("[api] update product %s: %v", id, err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "failed to update product",
+		})
+	}
+
+	return c.JSON(product)
+}
+
 func (h *ProductHandler) DeleteProduct(c fiber.Ctx) error {
 	id := c.Params("id")
 	if _, err := uuid.Parse(id); err != nil {
