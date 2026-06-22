@@ -307,6 +307,10 @@
   @apply py-20 text-center text-muted-foreground;
 }
 
+@utility skeleton {
+  @apply animate-pulse rounded-md bg-muted;
+}
+
 @utility detail-grid {
   @apply grid gap-10 py-12 lg:grid-cols-2 lg:gap-16;
 }

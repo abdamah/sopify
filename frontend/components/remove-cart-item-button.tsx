@@ -1,13 +1,22 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { removeFromCart } from "@/actions/cart";
+import type { CartResponse } from "@/lib/types";
 
-export function RemoveCartItemButton({ productId }: { productId: string }) {
-  const router = useRouter();
+type RemoveCartItemButtonProps = {
+  productId: string;
+  onCartChange: (cart: CartResponse) => void;
+  onUnauthenticated: () => void;
+};
+
+export function RemoveCartItemButton({
+  productId,
+  onCartChange,
+  onUnauthenticated,
+}: RemoveCartItemButtonProps) {
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -19,7 +28,7 @@ export function RemoveCartItemButton({ productId }: { productId: string }) {
 
       if (!result.ok) {
         if (result.unauthenticated) {
-          router.push("/login");
+          onUnauthenticated();
           return;
         }
 
@@ -27,7 +36,7 @@ export function RemoveCartItemButton({ productId }: { productId: string }) {
         return;
       }
 
-      router.refresh();
+      onCartChange(result.cart);
     });
   }
 

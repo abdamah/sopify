@@ -1,15 +1,16 @@
-import { Search, ShoppingCart } from "lucide-react";
+import { Search } from "lucide-react";
 import Link from "next/link";
 
 import { getMe } from "@/actions/auth";
 import { getCart } from "@/actions/cart";
+import { CartLink } from "@/components/cart-link";
 import { LogoutButton } from "@/components/logout-button";
+import { getCartItemCount } from "@/lib/cart-events";
 
 export async function Header() {
   const user = await getMe().catch(() => null);
   const cart = user ? await getCart().catch(() => null) : null;
-  const cartCount =
-    cart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
+  const cartCount = cart ? getCartItemCount(cart) : 0;
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background">
@@ -32,16 +33,7 @@ export async function Header() {
             <input className="header-search" placeholder="Search products" />
           </label>
 
-          {user ? (
-            <Link href="/cart" className="icon-button relative" aria-label="Cart">
-              <ShoppingCart className="size-5" aria-hidden="true" />
-              {cartCount > 0 ? (
-                <span className="absolute -right-1 -top-1 grid size-4 place-items-center rounded-full bg-primary text-[10px] font-bold leading-none text-primary-foreground">
-                  {cartCount}
-                </span>
-              ) : null}
-            </Link>
-          ) : null}
+          {user ? <CartLink initialCount={cartCount} /> : null}
 
           {user ? (
             <div className="hidden items-center gap-2 sm:flex">

@@ -350,11 +350,11 @@ All pass token from cookie.
 
 ### Tasks
 
-- [ ] Loading UI (`loading.tsx` for products/cart)
-- [ ] Error boundaries or inline error messages
-- [ ] Home page links to products
-- [ ] Responsive grid (mobile-friendly)
-- [ ] `revalidatePath` after cart mutations so UI updates
+- [x] Loading UI (`loading.tsx` for products/cart)
+- [x] Error boundaries or inline error messages
+- [x] Home page links to products
+- [x] Responsive grid (mobile-friendly)
+- [x] `revalidatePath` after cart mutations so UI updates
 
 ---
 
@@ -426,9 +426,9 @@ cd frontend && npm run dev
 |-------|--------|
 | 1 — Setup | Done |
 | 2 — Products | Done |
-| 3 — Auth | Not started |
-| 4 — Cart | Not started |
-| 5 — Polish | Not started |
+| 3 — Auth | Done |
+| 4 — Cart | Done |
+| 5 — Polish | Done |
 | 6 — Admin | Not started |
 | 7 — Checkout | Not started |
 

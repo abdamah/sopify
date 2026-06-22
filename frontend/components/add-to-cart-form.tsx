@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { addToCart } from "@/actions/cart";
+import { emitCartUpdated } from "@/lib/cart-events";
 
 type AddToCartFormProps = {
   productId: string;
@@ -43,7 +44,7 @@ export function AddToCartForm({ productId, stock }: AddToCartFormProps) {
       }
 
       setMessage("Added to cart");
-      router.refresh();
+      emitCartUpdated(result.cart);
     });
   }
 
