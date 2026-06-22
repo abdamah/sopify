@@ -6,3 +6,12 @@ export const authSchema = z.object({
 });
 
 export type AuthFormValues = z.infer<typeof authSchema>;
+
+export const createProductSchema = z.object({
+  name: z.string().trim().min(1, "Name is required"),
+  description: z.string().trim(),
+  price: z.coerce.number().positive("Price must be greater than 0"),
+  stock: z.coerce.number().int().min(0, "Stock must be 0 or greater"),
+});
+
+export type CreateProductFormValues = z.infer<typeof createProductSchema>;

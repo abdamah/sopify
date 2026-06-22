@@ -9,6 +9,13 @@ export type Product = {
   updated_at: string;
 };
 
+export type CreateProductInput = {
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+};
+
 export type User = {
   id: string;
   email: string;

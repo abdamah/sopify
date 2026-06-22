@@ -366,10 +366,11 @@ Depends on backend Phase 6+ (Cloudflare Images, etc.).
 
 ### Tasks
 
-- [ ] Admin layout or `/admin` routes
-- [ ] Guard: only show if `user.role === "admin"`
-- [ ] Create product form → `POST /admin/products`
-- [ ] Delete product → `DELETE /admin/products/:id`
+- [x] `actions/admin.ts` — `createProduct`, `deleteProduct`
+- [x] Admin layout or `/admin` routes
+- [x] Guard: only show if `user.role === "admin"`
+- [x] Create product form → `POST /admin/products`
+- [x] Delete product → `DELETE /admin/products/:id`
 - [ ] Image upload when backend supports multipart
 
 ---
@@ -429,7 +430,7 @@ cd frontend && npm run dev
 | 3 — Auth | Done |
 | 4 — Cart | Done |
 | 5 — Polish | Done |
-| 6 — Admin | Not started |
+| 6 — Admin | In progress |
 | 7 — Checkout | Not started |
 
 ---

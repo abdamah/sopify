@@ -23,6 +23,11 @@ export async function Header() {
           <Link href="/products" className="nav-link">
             Shop
           </Link>
+          {user?.role === "admin" ? (
+            <Link href="/admin" className="nav-link">
+              Admin
+            </Link>
+          ) : null}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
