@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { DeleteProductButton } from "@/components/delete-product-button";
 import { ProductModal } from "@/components/product-modal";
 import { SearchInput } from "@/components/search-input";
-import type { Product } from "@/lib/types";
+import type { Category, Product } from "@/lib/types";
 import { getProductImageUrl } from "@/lib/utils";
 
 const PAGE_SIZE = 8;
@@ -32,10 +32,12 @@ function StockBadge({ stock }: { stock: number }) {
 
 type AdminProductsPanelProps = {
   initialProducts: Product[];
+  categories: Category[];
 };
 
 export function AdminProductsPanel({
   initialProducts,
+  categories,
 }: AdminProductsPanelProps) {
   const [products, setProducts] = useState(initialProducts);
   const [searchQuery, setSearchQuery] = useState("");
@@ -147,6 +149,7 @@ export function AdminProductsPanel({
             <thead className="admin-table-head">
               <tr>
                 <th className="admin-table-th">Product</th>
+                <th className="admin-table-th">Category</th>
                 <th className="admin-table-th">Price</th>
                 <th className="admin-table-th">Stock</th>
                 <th className="admin-table-th">ID</th>
@@ -175,6 +178,9 @@ export function AdminProductsPanel({
                         </div>
                       </div>
                     </div>
+                  </td>
+                  <td className="admin-table-td text-sm text-muted-foreground">
+                    {product.category.name}
                   </td>
                   <td className="admin-table-td admin-td-price">
                     {formatPrice(product.price)}
@@ -247,6 +253,7 @@ export function AdminProductsPanel({
       <ProductModal
         open={isModalOpen}
         product={editingProduct}
+        categories={categories}
         onClose={closeModal}
         onSuccess={handleProductSaved}
       />

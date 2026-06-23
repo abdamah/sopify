@@ -9,6 +9,8 @@ type Product struct {
 	Price       float64   `json:"price"`
 	ImageURL    string    `json:"image_url"`
 	Stock       int       `json:"stock"`
+	CategoryID  string    `json:"category_id"`
+	Category    Category  `json:"category"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
@@ -18,4 +20,5 @@ type CreateProductInput struct {
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`
 	Stock       int     `json:"stock"`
+	CategoryID  string  `json:"category_id"`
 }

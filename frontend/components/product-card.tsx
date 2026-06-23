@@ -26,16 +26,19 @@ export function ProductCard({ product }: { product: Product }) {
             className="product-card-image"
             unoptimized
           />
-          <span
-            className={`absolute right-2.5 top-2.5 ${
-              isInStock ? "stock-badge" : "stock-badge-empty"
-            }`}
-          >
-            {isInStock ? "In stock" : "Out"}
-          </span>
         </div>
 
         <div className="product-card-body">
+          <div className="mb-1 flex items-start justify-between gap-2">
+            <p className="text-[10px] font-mono font-medium uppercase tracking-[0.2em] text-primary">
+              {product.category.name}
+            </p>
+            <span
+              className={isInStock ? "stock-badge" : "stock-badge-empty"}
+            >
+              {isInStock ? "In stock" : "Out"}
+            </span>
+          </div>
           <h2 className="product-card-title">{product.name}</h2>
           <p className="mb-3 text-base font-bold text-primary">
             {formatPrice(product.price)}
