@@ -12,15 +12,23 @@ import (
 )
 
 type ProductHandler struct {
-	repo *repository.ProductRepository
+	repo         *repository.ProductRepository
+	categoryRepo *repository.CategoryRepository
 }
 
-func NewProductHandler(repo *repository.ProductRepository) *ProductHandler {
-	return &ProductHandler{repo: repo}
+func NewProductHandler(
+	repo *repository.ProductRepository,
+	categoryRepo *repository.CategoryRepository,
+) *ProductHandler {
+	return &ProductHandler{
+		repo:         repo,
+		categoryRepo: categoryRepo,
+	}
 }
 
 func (h *ProductHandler) ProductList(c fiber.Ctx) error {
-	products, err := h.repo.ListProducts(c.Context())
+	categorySlug := strings.TrimSpace(c.Query("category"))
+	products, err := h.repo.ListProducts(c.Context(), categorySlug)
 	if err != nil {
 		log.Printf("[api] list products: %v", err)
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -64,7 +72,7 @@ func (h *ProductHandler) CreateProduct(c fiber.Ctx) error {
 	}
 
 	input.Name = strings.TrimSpace(input.Name)
-	if errMsg := validateCreateProductInput(input); errMsg != "" {
+	if errMsg := h.validateCreateProductInput(c, input); errMsg != "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": errMsg,
 		})
@@ -97,7 +105,7 @@ func (h *ProductHandler) UpdateProduct(c fiber.Ctx) error {
 	}
 
 	input.Name = strings.TrimSpace(input.Name)
-	if errMsg := validateCreateProductInput(input); errMsg != "" {
+	if errMsg := h.validateCreateProductInput(c, input); errMsg != "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": errMsg,
 		})
@@ -143,7 +151,7 @@ func (h *ProductHandler) DeleteProduct(c fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
-func validateCreateProductInput(input models.CreateProductInput) string {
+func (h *ProductHandler) validateCreateProductInput(c fiber.Ctx, input models.CreateProductInput) string {
 	switch {
 	case input.Name == "":
 		return "name is required"
@@ -151,6 +159,21 @@ func validateCreateProductInput(input models.CreateProductInput) string {
 		return "price must be greater than 0"
 	case input.Stock < 0:
 		return "stock must be 0 or greater"
+	case input.CategoryID == "":
+		return "category_id is required"
+	}
+
+	if _, err := uuid.Parse(input.CategoryID); err != nil {
+		return "invalid category id"
+	}
+
+	exists, err := h.categoryRepo.ExistsByID(c.Context(), input.CategoryID)
+	if err != nil {
+		log.Printf("[api] check category %s: %v", input.CategoryID, err)
+		return "failed to validate category"
+	}
+	if !exists {
+		return "category not found"
 	}
 
 	return ""

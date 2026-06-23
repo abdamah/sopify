@@ -33,14 +33,16 @@ func main() {
 	middleware.SetupCORS(app)
 
 	productRepo := repository.NewProductRepository(db)
+	categoryRepo := repository.NewCategoryRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	cartRepo := repository.NewCartRepository(db)
 	authMiddleware := middleware.NewAuthMiddleware(jwtService, userRepo)
-	productHandler := handlers.NewProductHandler(productRepo)
+	productHandler := handlers.NewProductHandler(productRepo, categoryRepo)
+	categoryHandler := handlers.NewCategoryHandler(categoryRepo)
 	authHandler := handlers.NewAuthHandler(userRepo, jwtService)
 	cartHandler := handlers.NewCartHandler(cartRepo, productRepo)
 
-	handlers.RegisterRoutes(app, productHandler, authHandler, cartHandler, authMiddleware)
+	handlers.RegisterRoutes(app, productHandler, categoryHandler, authHandler, cartHandler, authMiddleware)
 
 	log.Printf("[api] listening on :%s", cfg.Port)
 	log.Fatal(app.Listen(":"+cfg.Port, fiber.ListenConfig{

@@ -5,8 +5,16 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func RegisterRoutes(app *fiber.App, productHandler *ProductHandler, authHandler *AuthHandler, cartHandler *CartHandler, authMiddleware *middleware.AuthMiddleware) {
+func RegisterRoutes(
+	app *fiber.App,
+	productHandler *ProductHandler,
+	categoryHandler *CategoryHandler,
+	authHandler *AuthHandler,
+	cartHandler *CartHandler,
+	authMiddleware *middleware.AuthMiddleware,
+) {
 	app.Get("/health", Health)
+	app.Get("/categories", categoryHandler.ListCategories)
 	app.Get("/products", productHandler.ProductList)
 	app.Get("/products/:id", productHandler.GetProductByID)
 

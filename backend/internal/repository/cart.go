@@ -29,10 +29,16 @@ func (r *CartRepository) ListByUserID(ctx context.Context, userID string) ([]mod
 			p.price,
 			p.image_url,
 			p.stock,
+			p.category_id,
 			p.created_at,
-			p.updated_at
+			p.updated_at,
+			c.id,
+			c.name,
+			c.slug,
+			c.created_at
 		FROM cart_items ci
 		INNER JOIN products p ON p.id = ci.product_id
+		INNER JOIN categories c ON c.id = p.category_id
 		WHERE ci.user_id = $1
 		ORDER BY ci.created_at DESC
 	`, userID)
@@ -53,8 +59,13 @@ func (r *CartRepository) ListByUserID(ctx context.Context, userID string) ([]mod
 			&item.Product.Price,
 			&item.Product.ImageURL,
 			&item.Product.Stock,
+			&item.Product.CategoryID,
 			&item.Product.CreatedAt,
 			&item.Product.UpdatedAt,
+			&item.Product.Category.ID,
+			&item.Product.Category.Name,
+			&item.Product.Category.Slug,
+			&item.Product.Category.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
