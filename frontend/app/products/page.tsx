@@ -10,7 +10,7 @@ export default async function ProductsPage() {
         <div className="site-container">
           <h1 className="mb-1.5 text-3xl font-bold tracking-tight">Shop</h1>
           <p className="text-[15px] text-muted-foreground">
-            Browse all products available in your Sopify store.
+          Shop All Products
           </p>
         </div>
       </section>
