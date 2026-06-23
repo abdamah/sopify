@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { getMe } from "@/actions/auth";
 
@@ -14,7 +14,7 @@ export default async function AdminLayout({
   }
 
   if (user.role !== "admin") {
-    redirect("/products");
+    notFound();
   }
 
   return <div className="flex-1">{children}</div>;

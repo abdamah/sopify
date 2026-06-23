@@ -183,8 +183,20 @@
   @apply rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground;
 }
 
-@utility header-search {
-  @apply hidden w-[180px] rounded-full border border-border bg-muted py-1.5 pl-9 pr-3 text-[13px] outline-none transition-all placeholder:text-muted-foreground focus:w-[220px] focus:border-primary focus:bg-background md:block;
+@utility search-wrap {
+  @apply relative;
+}
+
+@utility search-icon {
+  @apply pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground;
+}
+
+@utility search-input {
+  @apply w-full rounded-full border border-border bg-muted py-2 pl-9 pr-3 text-sm outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:bg-background sm:w-64;
+}
+
+@utility search-input-header {
+  @apply hidden w-[180px] py-1.5 text-[13px] focus:w-[220px] md:block;
 }
 
 @utility icon-button {
@@ -405,14 +417,6 @@
 
 @utility admin-controls {
   @apply flex flex-wrap items-center gap-3;
-}
-
-@utility admin-search-wrap {
-  @apply relative;
-}
-
-@utility admin-search-input {
-  @apply w-full rounded-md border border-border bg-background py-2.5 pr-3.5 pl-9 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary sm:w-60;
 }
 
 @utility admin-table-wrap {

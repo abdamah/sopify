@@ -1,11 +1,11 @@
 "use client";
 
-import { Search } from "lucide-react";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 
 import { DeleteProductButton } from "@/components/delete-product-button";
 import { ProductModal } from "@/components/product-modal";
+import { SearchInput } from "@/components/search-input";
 import type { Product } from "@/lib/types";
 import { getProductImageUrl } from "@/lib/utils";
 
@@ -109,19 +109,11 @@ export function AdminProductsPanel({
         </h1>
 
         <div className="admin-controls">
-          <div className="admin-search-wrap">
-            <Search
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(event) => handleSearch(event.target.value)}
-              className="admin-search-input"
-              placeholder="Search products…"
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={handleSearch}
+            placeholder="Search products…"
+          />
           <button
             type="button"
             className="primary-button"
