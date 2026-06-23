@@ -12,6 +12,7 @@ export const createProductSchema = z.object({
   description: z.string().trim(),
   price: z.coerce.number().positive("Price must be greater than 0"),
   stock: z.coerce.number().int().min(0, "Stock must be 0 or greater"),
+  category_id: z.uuid("Select a category"),
 });
 
 export type CreateProductFormValues = z.infer<typeof createProductSchema>;

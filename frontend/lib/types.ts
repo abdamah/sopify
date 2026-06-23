@@ -1,3 +1,10 @@
+export type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: string;
+};
+
 export type Product = {
   id: string;
   name: string;
@@ -5,6 +12,8 @@ export type Product = {
   price: number;
   image_url: string;
   stock: number;
+  category_id: string;
+  category: Category;
   created_at: string;
   updated_at: string;
 };
@@ -14,6 +23,7 @@ export type CreateProductInput = {
   description: string;
   price: number;
   stock: number;
+  category_id: string;
 };
 
 export type User = {

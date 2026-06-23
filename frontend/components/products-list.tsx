@@ -4,43 +4,92 @@ import { useMemo, useState } from "react";
 
 import { ProductCard } from "@/components/product-card";
 import { SearchInput } from "@/components/search-input";
-import type { Product } from "@/lib/types";
+import type { Category, Product } from "@/lib/types";
 
 type ProductsListProps = {
   products: Product[];
+  categories: Category[];
 };
 
-export function ProductsList({ products }: ProductsListProps) {
+export function ProductsList({ products, categories }: ProductsListProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    if (!query) {
-      return products;
-    }
 
     return products.filter((product) => {
+      const matchesCategory =
+        selectedCategory === "all" ||
+        product.category.slug === selectedCategory;
+
+      if (!matchesCategory) {
+        return false;
+      }
+
+      if (!query) {
+        return true;
+      }
+
       const name = product.name.toLowerCase();
       const description = product.description.toLowerCase();
-      return name.includes(query) || description.includes(query);
+      const category = product.category.name.toLowerCase();
+
+      return (
+        name.includes(query) ||
+        description.includes(query) ||
+        category.includes(query)
+      );
     });
-  }, [products, searchQuery]);
+  }, [products, searchQuery, selectedCategory]);
+
+  function clearFilters() {
+    setSearchQuery("");
+    setSelectedCategory("all");
+  }
 
   return (
     <>
       <div className="shop-controls">
-        <p className="text-sm text-muted-foreground">
-          Showing{" "}
-          <strong className="text-foreground">{filteredProducts.length}</strong>{" "}
-          product{filteredProducts.length !== 1 ? "s" : ""}
-        </p>
         <SearchInput
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder="Search products"
-          variant="header"
+          placeholder="Search products…"
+          className="max-w-[340px] w-full"
         />
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setSelectedCategory("all")}
+            className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              selectedCategory === "all"
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-secondary"
+            }`}
+          >
+            All
+          </button>
+          {categories.map((category) => (
+            <button
+              key={category.id}
+              type="button"
+              onClick={() => setSelectedCategory(category.slug)}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                selectedCategory === category.slug
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-secondary"
+              }`}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
       </div>
+
+      <p className="mb-6 text-xs font-mono uppercase tracking-widest text-[#aaaaaa]">
+        {filteredProducts.length} result
+        {filteredProducts.length !== 1 ? "s" : ""}
+      </p>
 
       {products.length === 0 ? (
         <div className="empty-state">
@@ -54,7 +103,14 @@ export function ProductsList({ products }: ProductsListProps) {
           <h3 className="mb-2 text-lg font-semibold text-foreground">
             No products found
           </h3>
-          <p>Try a different search term.</p>
+          <p className="mb-6">Try adjusting your search or filter.</p>
+          <button
+            type="button"
+            className="primary-button"
+            onClick={clearFilters}
+          >
+            Clear filters
+          </button>
         </div>
       ) : (
         <div className="product-grid">

@@ -4,12 +4,13 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState, useTransition } from "react";
 
 import { createProduct, updateProduct } from "@/actions/admin";
-import type { Product } from "@/lib/types";
+import type { Category, Product } from "@/lib/types";
 import { createProductSchema } from "@/lib/validation";
 
 type ProductModalProps = {
   open: boolean;
   product?: Product | null;
+  categories: Category[];
   onClose: () => void;
   onSuccess: (product: Product) => void;
 };
@@ -17,6 +18,7 @@ type ProductModalProps = {
 export function ProductModal({
   open,
   product,
+  categories,
   onClose,
   onSuccess,
 }: ProductModalProps) {
@@ -45,6 +47,7 @@ export function ProductModal({
       description: String(formData.get("description") ?? ""),
       price: formData.get("price"),
       stock: formData.get("stock"),
+      category_id: String(formData.get("category_id") ?? ""),
     };
 
     const parsed = createProductSchema.safeParse(values);
@@ -141,6 +144,25 @@ export function ProductModal({
                 placeholder="Short product description…"
                 defaultValue={product?.description ?? ""}
               />
+            </div>
+
+            <div>
+              <label htmlFor="modal-category" className="form-label">
+                Category <span className="text-red-600">*</span>
+              </label>
+              <select
+                id="modal-category"
+                name="category_id"
+                className="form-input"
+                defaultValue={product?.category_id ?? categories[0]?.id ?? ""}
+                required
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

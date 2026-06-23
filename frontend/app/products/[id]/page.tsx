@@ -44,6 +44,8 @@ export default async function ProductDetailPage({
               Shop
             </Link>
             <span>/</span>
+            <span>{product.category.name}</span>
+            <span>/</span>
             <span>{product.name}</span>
           </div>
 
