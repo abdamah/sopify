@@ -1,6 +1,14 @@
+import { redirect } from "next/navigation";
+
+import { getMe } from "@/actions/auth";
 import { LoginForm } from "@/components/login-form";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const user = await getMe();
+  if (user) {
+    redirect("/");
+  }
+
   return (
     <main className="auth-shell">
       <section className="auth-card">

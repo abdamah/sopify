@@ -1,6 +1,14 @@
+import { redirect } from "next/navigation";
+
+import { getMe } from "@/actions/auth";
 import { RegisterForm } from "@/components/register-form";
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const user = await getMe();
+  if (user) {
+    redirect("/");
+  }
+
   return (
     <main className="auth-shell">
       <section className="auth-card">
