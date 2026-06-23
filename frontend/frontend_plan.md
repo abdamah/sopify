@@ -92,7 +92,11 @@ Backend CORS already allows `http://localhost:3000`.
 | GET | `/me` | user | 3 |
 | GET | `/cart` | user | 4 |
 | POST | `/cart` | user | 4 |
+| PATCH | `/cart/:product_id` | user | 4 |
 | DELETE | `/cart/:product_id` | user | 4 |
+| POST | `/admin/products` | admin | 6 |
+| PATCH | `/admin/products/:id` | admin | 6 |
+| DELETE | `/admin/products/:id` | admin | 6 |
 
 ---
 
@@ -355,6 +359,8 @@ All pass token from cookie.
 - [x] Home page links to products
 - [x] Responsive grid (mobile-friendly)
 - [x] `revalidatePath` after cart mutations so UI updates
+- [x] Product search on `/products`
+- [x] Admin `loading.tsx` and `error.tsx`
 
 ---
 
@@ -366,10 +372,11 @@ Depends on backend Phase 6+ (Cloudflare Images, etc.).
 
 ### Tasks
 
-- [x] `actions/admin.ts` — `createProduct`, `deleteProduct`
+- [x] `actions/admin.ts` — `createProduct`, `updateProduct`, `deleteProduct`
 - [x] Admin layout or `/admin` routes
 - [x] Guard: only show if `user.role === "admin"`
 - [x] Create product form → `POST /admin/products`
+- [x] Edit product modal → `PATCH /admin/products/:id`
 - [x] Delete product → `DELETE /admin/products/:id`
 - [ ] Image upload when backend supports multipart
 

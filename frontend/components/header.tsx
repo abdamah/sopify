@@ -1,9 +1,9 @@
-import { Search } from "lucide-react";
 import Link from "next/link";
 
 import { getMe } from "@/actions/auth";
 import { getCart } from "@/actions/cart";
 import { CartLink } from "@/components/cart-link";
+import { HeaderSearch } from "@/components/header-search";
 import { LogoutButton } from "@/components/logout-button";
 import { getCartItemCount } from "@/lib/cart-events";
 
@@ -31,12 +31,7 @@ export async function Header() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
-          <label className="relative">
-            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#aaaaaa]">
-              <Search className="size-4" aria-hidden="true" />
-            </span>
-            <input className="header-search" placeholder="Search products" />
-          </label>
+          <HeaderSearch />
 
           {user ? <CartLink initialCount={cartCount} /> : null}
 
