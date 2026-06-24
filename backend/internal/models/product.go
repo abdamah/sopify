@@ -21,4 +21,5 @@ type CreateProductInput struct {
 	Price       float64 `json:"price"`
 	Stock       int     `json:"stock"`
 	CategoryID  string  `json:"category_id"`
+	ImageURL    string  `json:"image_url,omitempty"`
 }

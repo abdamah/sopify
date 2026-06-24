@@ -1,7 +1,7 @@
 # Sopify Backend Plan
 
 **Author:** Abdallah  
-**Stack:** Go · Fiber v3 · PostgreSQL · Clerk JWT · Cloudflare Images · Stripe
+**Stack:** Go · Fiber v3 · PostgreSQL · JWT auth · Stripe
 
 **Module:** `github.com/abdamah/dailykode/sopify/backend`  
 **Requires:** Go 1.25+ (Fiber v3)
@@ -26,7 +26,7 @@ backend/
 │   ├── middleware/    # Clerk JWT, admin, CORS
 │   ├── models/        # structs
 │   ├── repository/    # DB queries
-│   └── services/      # business logic (stripe, cloudflare)
+│   └── storage/       # local product image uploads
 ├── migrations/
 ├── .env.example
 └── go.mod
@@ -194,18 +194,17 @@ Prevent quantity > stock; return 400 with message.
 
 ---
 
-# Phase 6 — Cloudflare Images
+# Phase 6 — Product image upload (local)
 
-**Goal:** Admin uploads product image on create.
+**Goal:** Admin uploads product image on create/update.
 
 ### Tasks
 
-- [ ] Env: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
-- [ ] Service: upload image to Cloudflare Images API
-- [ ] `POST /admin/products` — multipart: fields + `image` file
-- [ ] Save `image_url` on product
-- [ ] Validate file type (jpeg, png, webp) and max size
-- [ ] Protect `/admin/*` with `RequireAdmin`
+- [x] `POST/PATCH /admin/products` — multipart: fields + `image` file
+- [x] Local storage in `uploads/` + serve at `/uploads/*`
+- [x] Save `image_url` on product
+- [x] Validate file type (jpeg, png, webp) and max size (5MB)
+- [x] Protect `/admin/*` with `RequireAdmin`
 
 ### Deliverable
 
@@ -275,7 +274,7 @@ Add `PATCH /admin/orders/:id/status` → `shipped`.
 
 - [ ] Dockerfile or Railway/Fly config
 - [ ] Run migrations on deploy
-- [ ] Production env vars (Clerk, Stripe, Cloudflare, DB)
+- [ ] Production env vars (JWT, Stripe, DB)
 - [ ] Stripe webhook URL → `https://api.yoursite.com/webhooks/stripe`
 - [ ] CORS: allow production frontend URL only
 
@@ -293,9 +292,8 @@ DATABASE_URL=postgres://...
 CLERK_JWKS_URL=https://...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-CLOUDFLARE_ACCOUNT_ID=
-CLOUDFLARE_API_TOKEN=
 FRONTEND_URL=http://localhost:3000
+UPLOAD_DIR=uploads
 ```
 
 ---
@@ -309,7 +307,7 @@ FRONTEND_URL=http://localhost:3000
 | 3 | Admin CRUD | `/admin/products` |
 | 4 | Clerk JWT | `/me` |
 | 5 | Cart | `/cart` |
-| 6 | Images | upload on product create |
+| 6 | Local image upload | multipart `/admin/products` |
 | 7 | Stripe | `/checkout`, `/webhooks/stripe` |
 | 8 | Orders + polish | `/admin/orders` |
 | 9 | Deploy | production |

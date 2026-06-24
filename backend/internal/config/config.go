@@ -13,6 +13,7 @@ type Config struct {
 	DatabaseURL string
 	JWTSecret   string
 	JWTExpiry   time.Duration
+	UploadDir   string
 }
 
 func Load() (*Config, error) {
@@ -42,10 +43,16 @@ func Load() (*Config, error) {
 		jwtExpiry = parsed
 	}
 
+	uploadDir := os.Getenv("UPLOAD_DIR")
+	if uploadDir == "" {
+		uploadDir = "uploads"
+	}
+
 	return &Config{
 		Port:        port,
 		DatabaseURL: databaseURL,
 		JWTSecret:   jwtSecret,
 		JWTExpiry:   jwtExpiry,
+		UploadDir:   uploadDir,
 	}, nil
 }

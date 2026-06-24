@@ -9,7 +9,9 @@ import (
 	"github.com/abdamah/dailykode/sopify/backend/internal/handlers"
 	"github.com/abdamah/dailykode/sopify/backend/internal/middleware"
 	"github.com/abdamah/dailykode/sopify/backend/internal/repository"
+	"github.com/abdamah/dailykode/sopify/backend/internal/storage"
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/static"
 )
 
 func main() {
@@ -26,18 +28,26 @@ func main() {
 	}
 	defer db.Close()
 
+	uploads, err := storage.NewLocalStorage(cfg.UploadDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	jwtService := auth.NewJWTService(cfg.JWTSecret, cfg.JWTExpiry)
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		BodyLimit: storage.MaxUploadBytes,
+	})
 	middleware.SetupLogger(app)
 	middleware.SetupCORS(app)
+	app.Use("/uploads", static.New(cfg.UploadDir))
 
 	productRepo := repository.NewProductRepository(db)
 	categoryRepo := repository.NewCategoryRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	cartRepo := repository.NewCartRepository(db)
 	authMiddleware := middleware.NewAuthMiddleware(jwtService, userRepo)
-	productHandler := handlers.NewProductHandler(productRepo, categoryRepo)
+	productHandler := handlers.NewProductHandler(productRepo, categoryRepo, uploads)
 	categoryHandler := handlers.NewCategoryHandler(categoryRepo)
 	authHandler := handlers.NewAuthHandler(userRepo, jwtService)
 	cartHandler := handlers.NewCartHandler(cartRepo, productRepo)

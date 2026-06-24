@@ -105,10 +105,10 @@ func (r *ProductRepository) GetProductByID(ctx context.Context, id string) (*mod
 func (r *ProductRepository) CreateProduct(ctx context.Context, input models.CreateProductInput) (*models.Product, error) {
 	var id string
 	err := r.db.QueryRowContext(ctx, `
-		INSERT INTO products (name, description, price, stock, category_id)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO products (name, description, price, stock, category_id, image_url)
+		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id
-	`, input.Name, input.Description, input.Price, input.Stock, input.CategoryID).Scan(&id)
+	`, input.Name, input.Description, input.Price, input.Stock, input.CategoryID, input.ImageURL).Scan(&id)
 	if err != nil {
 		return nil, err
 	}
@@ -124,9 +124,10 @@ func (r *ProductRepository) UpdateProduct(ctx context.Context, id string, input 
 		    price = $4,
 		    stock = $5,
 		    category_id = $6,
+		    image_url = CASE WHEN $7 <> '' THEN $7 ELSE image_url END,
 		    updated_at = NOW()
 		WHERE id = $1
-	`, id, input.Name, input.Description, input.Price, input.Stock, input.CategoryID)
+	`, id, input.Name, input.Description, input.Price, input.Stock, input.CategoryID, input.ImageURL)
 	if err != nil {
 		return nil, err
 	}

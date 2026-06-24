@@ -31,5 +31,8 @@ Thumbs.db
 # Logs
 *.log
 
+# Uploaded product images
+uploads/
+
 # Debug
 __debug_bin

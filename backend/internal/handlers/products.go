@@ -7,6 +7,7 @@ import (
 
 	"github.com/abdamah/dailykode/sopify/backend/internal/models"
 	"github.com/abdamah/dailykode/sopify/backend/internal/repository"
+	"github.com/abdamah/dailykode/sopify/backend/internal/storage"
 	"github.com/gofiber/fiber/v3"
 	"github.com/google/uuid"
 )
@@ -14,15 +15,18 @@ import (
 type ProductHandler struct {
 	repo         *repository.ProductRepository
 	categoryRepo *repository.CategoryRepository
+	uploads      *storage.LocalStorage
 }
 
 func NewProductHandler(
 	repo *repository.ProductRepository,
 	categoryRepo *repository.CategoryRepository,
+	uploads *storage.LocalStorage,
 ) *ProductHandler {
 	return &ProductHandler{
 		repo:         repo,
 		categoryRepo: categoryRepo,
+		uploads:      uploads,
 	}
 }
 
@@ -64,14 +68,13 @@ func (h *ProductHandler) GetProductByID(c fiber.Ctx) error {
 }
 
 func (h *ProductHandler) CreateProduct(c fiber.Ctx) error {
-	var input models.CreateProductInput
-	if err := c.Bind().Body(&input); err != nil {
+	input, err := parseProductForm(c, h.uploads, false)
+	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid request body",
+			"error": err.Error(),
 		})
 	}
 
-	input.Name = strings.TrimSpace(input.Name)
 	if errMsg := h.validateCreateProductInput(c, input); errMsg != "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": errMsg,
@@ -97,14 +100,13 @@ func (h *ProductHandler) UpdateProduct(c fiber.Ctx) error {
 		})
 	}
 
-	var input models.CreateProductInput
-	if err := c.Bind().Body(&input); err != nil {
+	input, err := parseProductForm(c, h.uploads, false)
+	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"error": "invalid request body",
+			"error": err.Error(),
 		})
 	}
 
-	input.Name = strings.TrimSpace(input.Name)
 	if errMsg := h.validateCreateProductInput(c, input); errMsg != "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": errMsg,
