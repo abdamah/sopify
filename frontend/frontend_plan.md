@@ -364,11 +364,9 @@ All pass token from cookie.
 
 ---
 
-# Phase 6 — Admin UI (later, when backend ready)
+# Phase 6 — Admin UI
 
 **Goal:** Admin product management in the browser.
-
-Depends on backend Phase 6+ (Cloudflare Images, etc.).
 
 ### Tasks
 
@@ -378,7 +376,7 @@ Depends on backend Phase 6+ (Cloudflare Images, etc.).
 - [x] Create product form → `POST /admin/products`
 - [x] Edit product modal → `PATCH /admin/products/:id`
 - [x] Delete product → `DELETE /admin/products/:id`
-- [ ] Image upload when backend supports multipart
+- [x] Image upload — multipart `POST/PATCH /admin/products`, local `uploads/` storage
 
 ---
 
@@ -437,7 +435,7 @@ cd frontend && npm run dev
 | 3 — Auth | Done |
 | 4 — Cart | Done |
 | 5 — Polish | Done |
-| 6 — Admin | In progress |
+| 6 — Admin | Done |
 | 7 — Checkout | Not started |
 
 ---

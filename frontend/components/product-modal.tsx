@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState, useTransition } from "react";
 
 import { createProduct, updateProduct } from "@/actions/admin";
 import type { Category, Product } from "@/lib/types";
+import { getProductImageUrl } from "@/lib/utils";
 import { createProductSchema } from "@/lib/validation";
 
 type ProductModalProps = {
@@ -60,8 +62,8 @@ export function ProductModal({
 
     startTransition(async () => {
       const result = isEditing
-        ? await updateProduct(product!.id, parsed.data)
-        : await createProduct(parsed.data);
+        ? await updateProduct(product!.id, formData)
+        : await createProduct(formData);
 
       if (!result.ok) {
         if (result.unauthenticated) {
@@ -113,9 +115,42 @@ export function ProductModal({
           </button>
         </div>
 
-        <form key={product?.id ?? "new"} onSubmit={handleSubmit}>
+        <form
+          key={product?.id ?? "new"}
+          encType="multipart/form-data"
+          onSubmit={handleSubmit}
+        >
           <div className="modal-body">
             {error ? <p className="form-error">{error}</p> : null}
+
+            <div>
+              <label htmlFor="modal-image" className="form-label">
+                Product image
+              </label>
+              {product?.image_url ? (
+                <div className="mb-3 overflow-hidden rounded-xl border border-border">
+                  <Image
+                    src={getProductImageUrl(product.image_url)}
+                    alt={product.name}
+                    width={480}
+                    height={240}
+                    className="h-40 w-full object-cover"
+                    unoptimized
+                  />
+                </div>
+              ) : null}
+              <input
+                id="modal-image"
+                name="image"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="form-input file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary"
+              />
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                JPEG, PNG, or WebP. Max 5MB. Leave empty to keep the current
+                image when editing.
+              </p>
+            </div>
 
             <div>
               <label htmlFor="modal-name" className="form-label">

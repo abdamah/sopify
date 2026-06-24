@@ -72,21 +72,3 @@ export async function logout(): Promise<void> {
     await clearToken();
   }
 }
-
-export async function getMe(): Promise<User | null> {
-  const token = await getToken();
-  if (!token) {
-    return null;
-  }
-
-  try {
-    return await api.get<User>("/me", token);
-  } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      await clearToken();
-      return null;
-    }
-
-    throw error;
-  }
-}

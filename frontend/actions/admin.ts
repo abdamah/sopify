@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 
 import { getToken } from "@/lib/auth";
 import { api } from "@/lib/api";
-import type { CreateProductInput, Product } from "@/lib/types";
+import type { Product } from "@/lib/types";
 
 type AdminActionResult =
   | { ok: true; product: Product }
@@ -62,7 +62,7 @@ function getAdminActionError(
 }
 
 export async function createProduct(
-  input: CreateProductInput
+  formData: FormData
 ): Promise<AdminActionResult> {
   const token = await getToken();
   if (!token) {
@@ -74,7 +74,7 @@ export async function createProduct(
   }
 
   try {
-    const product = await api.post<Product>("/admin/products", input, token);
+    const product = await api.postForm<Product>("/admin/products", formData, token);
 
     revalidatePath("/products");
     revalidatePath("/admin");
@@ -88,7 +88,7 @@ export async function createProduct(
 
 export async function updateProduct(
   productId: string,
-  input: CreateProductInput
+  formData: FormData
 ): Promise<AdminActionResult> {
   const token = await getToken();
   if (!token) {
@@ -100,9 +100,9 @@ export async function updateProduct(
   }
 
   try {
-    const product = await api.patch<Product>(
+    const product = await api.patchForm<Product>(
       `/admin/products/${productId}`,
-      input,
+      formData,
       token
     );
 

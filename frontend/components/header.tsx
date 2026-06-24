@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ShoppingBasket } from "lucide-react";
 
 
-import { getMe } from "@/actions/auth";
+import { getMe } from "@/lib/session";
 import { getCart } from "@/actions/cart";
 import { CartLink } from "@/components/cart-link";
 import { HeaderSearch } from "@/components/header-search";

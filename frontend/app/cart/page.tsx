@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { getMe } from "@/actions/auth";
+import { getMe } from "@/lib/session";
 import { getCart } from "@/actions/cart";
 import { CartContents } from "@/components/cart-contents";
 

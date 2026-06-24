@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 
-import { getMe } from "@/actions/auth";
+import { getMe } from "@/lib/session";
 
 export default async function AdminLayout({
   children,
