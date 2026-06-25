@@ -281,13 +281,3 @@ func (r *OrderRepository) ListByUserIDWithItems(ctx context.Context, userID stri
 
 	return orders, itemRows.Err()
 }
-
-func (r *OrderRepository) MarkPaid(ctx context.Context, orderID string) error {
-	_, err := r.db.ExecContext(ctx, `
-		UPDATE orders
-		SET status = 'paid',
-		    updated_at = NOW()
-		WHERE id = $1
-	`, orderID)
-	return err
-}
