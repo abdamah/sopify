@@ -9,11 +9,9 @@ export default async function AdminPage() {
   ]);
 
   return (
-    <main className="site-container admin-wrap">
-      <AdminProductsPanel
-        initialProducts={products}
-        categories={categories}
-      />
-    </main>
+    <AdminProductsPanel
+      initialProducts={products}
+      categories={categories}
+    />
   );
 }

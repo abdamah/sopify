@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { getToken } from "@/lib/auth";
 import { api } from "@/lib/api";
 import { getApiErrorMessage } from "@/lib/errors";
-import type { Product } from "@/lib/types";
+import type { Order, Product } from "@/lib/types";
 
 type AdminActionResult =
   | { ok: true; product: Product }
@@ -52,6 +52,15 @@ function getAdminActionError(
     ok: false,
     error: getApiErrorMessage(error, fallback),
   };
+}
+
+export async function getOrders(): Promise<Order[]> {
+  const token = await getToken();
+  if (!token) {
+    throw new Error("Please sign in to view orders");
+  }
+
+  return api.get<Order[]>("/admin/orders", token);
 }
 
 export async function createProduct(

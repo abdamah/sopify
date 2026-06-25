@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 
+import { AdminNav } from "@/components/admin-nav";
 import { getMe } from "@/lib/session";
 
 export default async function AdminLayout({
@@ -17,5 +18,10 @@ export default async function AdminLayout({
     notFound();
   }
 
-  return <div className="flex-1">{children}</div>;
+  return (
+    <main className="site-container admin-wrap">
+      <AdminNav />
+      {children}
+    </main>
+  );
 }

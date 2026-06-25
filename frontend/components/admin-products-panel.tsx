@@ -93,7 +93,7 @@ export function AdminProductsPanel({
   }
 
   return (
-    <div className="admin-wrap">
+    <>
       <div className="admin-topbar">
         <h1 className="admin-title">
           Product Management
@@ -250,6 +250,6 @@ export function AdminProductsPanel({
         onClose={closeModal}
         onSuccess={handleProductSaved}
       />
-    </div>
+    </>
   );
 }
