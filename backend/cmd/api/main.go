@@ -2,6 +2,9 @@ package main
 
 import (
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/abdamah/dailykode/sopify/backend/internal/auth"
 	"github.com/abdamah/dailykode/sopify/backend/internal/config"
@@ -55,11 +58,26 @@ func main() {
 	checkoutHandler := handlers.NewCheckoutHandler(cartRepo, cfg)
 	webhookHandler := handlers.NewStripeWebhookHandler(orderRepo, cartRepo, productRepo, cfg)
 	orderHandler := handlers.NewOrderHandler(orderRepo)
+	healthHandler := handlers.NewHealthHandler(db)
 
-	handlers.RegisterRoutes(app, productHandler, categoryHandler, authHandler, cartHandler, checkoutHandler, webhookHandler, orderHandler, authMiddleware)
+	handlers.RegisterRoutes(app, healthHandler, productHandler, categoryHandler, authHandler, cartHandler, checkoutHandler, webhookHandler, orderHandler, authMiddleware)
 
-	log.Printf("[api] listening on :%s", cfg.Port)
-	log.Fatal(app.Listen(":"+cfg.Port, fiber.ListenConfig{
-		DisableStartupMessage: true,
-	}))
+	go func() {
+		log.Printf("[api] listening on :%s", cfg.Port)
+		if err := app.Listen(":"+cfg.Port, fiber.ListenConfig{
+			DisableStartupMessage: true,
+		}); err != nil {
+			log.Printf("[api] server stopped: %v", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	<-quit
+
+	log.Println("[api] shutting down...")
+	if err := app.Shutdown(); err != nil {
+		log.Printf("[api] shutdown error: %v", err)
+	}
+	log.Println("[api] stopped")
 }

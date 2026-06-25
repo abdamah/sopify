@@ -7,6 +7,7 @@ import (
 
 func RegisterRoutes(
 	app *fiber.App,
+	healthHandler *HealthHandler,
 	productHandler *ProductHandler,
 	categoryHandler *CategoryHandler,
 	authHandler *AuthHandler,
@@ -16,7 +17,7 @@ func RegisterRoutes(
 	orderHandler *OrderHandler,
 	authMiddleware *middleware.AuthMiddleware,
 ) {
-	app.Get("/health", Health)
+	app.Get("/health", healthHandler.Health)
 	app.Get("/categories", categoryHandler.ListCategories)
 	app.Get("/products", productHandler.ProductList)
 	app.Get("/products/:id", productHandler.GetProductByID)
