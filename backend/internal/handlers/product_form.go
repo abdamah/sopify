@@ -46,6 +46,13 @@ func parseProductForm(c fiber.Ctx, uploads *storage.LocalStorage, requireImage b
 		return input, nil
 	}
 
+	if file.Size == 0 || strings.TrimSpace(file.Filename) == "" {
+		if requireImage {
+			return models.CreateProductInput{}, fmt.Errorf("image is required")
+		}
+		return input, nil
+	}
+
 	imageURL, err := uploads.SaveProductImage(file)
 	if err != nil {
 		return models.CreateProductInput{}, err
