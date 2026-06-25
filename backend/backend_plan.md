@@ -10,7 +10,7 @@
 
 ## Goal
 
-Build a simple REST API that powers Sopify: products, cart, checkout, orders, and admin — with Clerk for auth (no custom login endpoints).
+Build a simple REST API that powers Sopify: products, cart, checkout, orders, and admin — with custom JWT auth (`/auth/register`, `/auth/login`).
 
 ---
 
@@ -20,14 +20,16 @@ Build a simple REST API that powers Sopify: products, cart, checkout, orders, an
 backend/
 ├── cmd/api/main.go
 ├── internal/
+│   ├── auth/          # JWT sign/verify
 │   ├── config/        # env vars
 │   ├── database/      # postgres connection
 │   ├── handlers/      # HTTP handlers
-│   ├── middleware/    # Clerk JWT, admin, CORS
+│   ├── middleware/    # JWT auth, admin, CORS, logger
 │   ├── models/        # structs
 │   ├── repository/    # DB queries
 │   └── storage/       # local product image uploads
 ├── migrations/
+├── scripts/seed/      # products, categories, admin user
 ├── .env.example
 └── go.mod
 ```
@@ -38,33 +40,42 @@ backend/
 
 | Table | Key fields |
 |-------|------------|
-| `users` | id, clerk_id, email, role |
-| `products` | id, name, description, price, image_url, stock |
+| `users` | id, email, password_hash, role, active |
+| `categories` | id, name, slug |
+| `products` | id, name, description, price, image_url, stock, category_id |
 | `cart_items` | id, user_id, product_id, quantity |
 | `orders` | id, user_id, total, status, stripe_session_id |
 | `order_items` | id, order_id, product_id, quantity, price |
 
-**Order status:** `pending` → `paid` → `shipped` (optional)
+**Order status:** `pending` → `paid` → `shipped` → `cancelled`
 
 ---
 
 ## API overview
 
-| Method | Route | Auth | Phase |
-|--------|-------|------|-------|
-| GET | `/health` | — | 1 |
-| GET | `/products` | — | 2 |
-| GET | `/products/:id` | — | 2 |
-| POST | `/admin/products` | admin | 3 |
-| DELETE | `/admin/products/:id` | admin | 3 |
-| GET | `/me` | user | 4 |
-| GET | `/cart` | user | 5 |
-| POST | `/cart` | user | 5 |
-| DELETE | `/cart/:product_id` | user | 5 |
-| POST | `/admin/products` (+ image) | admin | 6 |
-| POST | `/checkout` | user | 7 |
-| POST | `/webhooks/stripe` | Stripe sig | 7 |
-| GET | `/admin/orders` | admin | 8 |
+| Method | Route | Auth | Status |
+|--------|-------|------|--------|
+| GET | `/health` | — | Done |
+| GET | `/categories` | — | Done |
+| GET | `/products` | — | Done |
+| GET | `/products/:id` | — | Done |
+| POST | `/auth/register` | — | Done |
+| POST | `/auth/login` | — | Done |
+| POST | `/auth/logout` | user | Done |
+| GET | `/me` | user | Done |
+| GET | `/cart` | user | Done |
+| POST | `/cart` | user | Done |
+| PATCH | `/cart/:product_id` | user | Done |
+| DELETE | `/cart/:product_id` | user | Done |
+| POST | `/checkout` | user | Done |
+| GET | `/orders` | user | Done |
+| POST | `/webhooks/stripe` | Stripe sig | Done |
+| POST | `/admin/products` | admin | Done |
+| PATCH | `/admin/products/:id` | admin | Done |
+| DELETE | `/admin/products/:id` | admin | Done |
+| GET | `/admin/orders` | admin | Done |
+
+Static: `GET /uploads/*` — served product images from local `uploads/` dir.
 
 ---
 
@@ -75,23 +86,10 @@ backend/
 ### Tasks
 
 - [x] Init Go module: `github.com/abdamah/dailykode/sopify/backend`
-- [x] Install Fiber v3: `go get github.com/gofiber/fiber/v3@latest`
+- [x] Install Fiber v3
 - [x] Create folder layout (`cmd/`, `internal/`, `migrations/`)
 - [x] `cmd/api/main.go` — start Fiber server
-- [x] `internal/handlers/health.go` — health handler
 - [x] `GET /health` → `{ "status": "ok", "app": "sopify" }`
-
-### Run
-
-```bash
-cd sopify/backend
-go run ./cmd/api
-curl http://localhost:8080/health
-```
-
-### Homework
-
-Add `version` field to the health JSON response.
 
 ---
 
@@ -101,73 +99,46 @@ Add `version` field to the health JSON response.
 
 ### Tasks
 
-- [ ] Load config from `.env` (`PORT`, `DATABASE_URL`)
-- [ ] Connect PostgreSQL (`pgx` or `database/sql`)
-- [ ] Migration: `products` table
-- [ ] `GET /products` — list all
-- [ ] `GET /products/:id` — single product
-- [ ] Seed 5 products (SQL or seed script)
-- [ ] CORS middleware for Next.js origin
-
-### Deliverable
-
-```bash
-curl http://localhost:8080/products
-```
-
-### Homework
-
-Add 3 more products via SQL seed file.
+- [x] Load config from `.env` (`PORT`, `DATABASE_URL`, `JWT_SECRET`)
+- [x] Connect PostgreSQL
+- [x] Migration: `products` table
+- [x] Migration: `categories` table + `products.category_id`
+- [x] `GET /categories` — list categories
+- [x] `GET /products` — list all (optional `?category=slug` filter)
+- [x] `GET /products/:id` — single product with nested category
+- [x] Seed products + categories (`make seed`)
+- [x] CORS middleware for Next.js origin
 
 ---
 
 # Phase 3 — Admin product CRUD
 
-**Goal:** Create and delete products (auth added in Phase 4).
+**Goal:** Create, update, and delete products.
 
 ### Tasks
 
-- [ ] Migration: extend `products` if needed
-- [ ] `POST /admin/products` — body: `{ name, description, price, stock }`
-- [ ] `DELETE /admin/products/:id`
-- [ ] Input validation (price > 0, name required)
-- [ ] Return proper status codes (201, 400, 404)
-- [ ] Repository layer: `CreateProduct`, `DeleteProduct`, `ListProducts`, `GetProduct`
-
-### Deliverable
-
-Postman: create product → list shows it → delete removes it.
-
-### Homework
-
-Handle duplicate product name or return clear 400 errors.
+- [x] `POST /admin/products` — multipart form fields + optional image
+- [x] `PATCH /admin/products/:id` — update fields; image optional (keeps existing if empty)
+- [x] `DELETE /admin/products/:id`
+- [x] Input validation (price > 0, name required, stock ≥ 0, category_id)
+- [x] Repository layer: `CreateProduct`, `UpdateProduct`, `DeleteProduct`, `ListProducts`, `GetProduct`
 
 ---
 
-# Phase 4 — Clerk auth
+# Phase 4 — JWT auth
 
-**Goal:** Verify JWT on protected routes; sync users to DB.
+**Goal:** Register/login; protect routes with Bearer token.
 
 ### Tasks
 
-- [ ] Clerk JWT middleware (`Authorization: Bearer <token>`)
-- [ ] Fetch/verify JWKS from Clerk
-- [ ] Extract `sub` (clerk_id) and `email` from claims
-- [ ] Migration: `users` table
-- [ ] `GET /me` — find or create user by `clerk_id`
-- [ ] Read `role` from Clerk `publicMetadata` or default `customer`
-- [ ] `RequireAuth` middleware
-- [ ] `RequireAdmin` middleware
-
-### Deliverable
-
-```bash
-curl -H "Authorization: Bearer <clerk_jwt>" http://localhost:8080/me
-```
-
-### Homework
-
-Return 401 without token, 403 for admin route as non-admin.
+- [x] `POST /auth/register` — create user, return JWT
+- [x] `POST /auth/login` — verify password, return JWT
+- [x] `POST /auth/logout` — authenticated logout
+- [x] Migration: `users` table (email, password_hash, role)
+- [x] `GET /me` — current user from JWT
+- [x] `RequireAuth` middleware
+- [x] `RequireAdmin` middleware
+- [x] Seed admin: `admin@sopify.com` / `Abc123@@` (`make seed`)
 
 ---
 
@@ -177,20 +148,14 @@ Return 401 without token, 403 for admin route as non-admin.
 
 ### Tasks
 
-- [ ] Migration: `cart_items` table
-- [ ] `GET /cart` — items + product details + total
-- [ ] `POST /cart` — `{ product_id, quantity }` (merge if exists)
-- [ ] `DELETE /cart/:product_id`
-- [ ] All cart routes behind `RequireAuth`
-- [ ] Validate product exists and stock available
-
-### Deliverable
-
-Sign in → add 2 products → GET cart shows correct total.
-
-### Homework
-
-Prevent quantity > stock; return 400 with message.
+- [x] Migration: `cart_items` table
+- [x] `GET /cart` — items + product details + total
+- [x] `POST /cart` — `{ product_id, quantity }` (merge if exists)
+- [x] `PATCH /cart/:product_id` — update quantity
+- [x] `DELETE /cart/:product_id`
+- [x] All cart routes behind `RequireAuth`
+- [x] Validate product exists and stock available
+- [x] Prevent quantity > stock; return 400 with message
 
 ---
 
@@ -205,14 +170,7 @@ Prevent quantity > stock; return 400 with message.
 - [x] Save `image_url` on product
 - [x] Validate file type (jpeg, png, webp) and max size (5MB)
 - [x] Protect `/admin/*` with `RequireAdmin`
-
-### Deliverable
-
-Admin creates product with image → `GET /products` returns `image_url`.
-
-### Homework
-
-Return default placeholder if no image uploaded.
+- [x] PATCH: empty file input keeps existing image
 
 ---
 
@@ -222,47 +180,44 @@ Return default placeholder if no image uploaded.
 
 ### Tasks
 
-- [ ] Env: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
-- [ ] `POST /checkout` — build line items from cart
-- [ ] Create Stripe Checkout Session → return `{ url }`
-- [ ] `POST /webhooks/stripe` — verify signature
-- [ ] On `checkout.session.completed`:
+- [x] Env: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `FRONTEND_URL`
+- [x] `POST /checkout` — build line items from cart → Stripe Checkout Session → `{ url }`
+- [x] `POST /webhooks/stripe` — verify signature (`IgnoreAPIVersionMismatch` for Stripe CLI)
+- [x] On `checkout.session.completed`:
   - Create `orders` + `order_items`
   - Set status `paid`
+  - Decrement `products.stock`
   - Clear user cart
-- [ ] Migrations: `orders`, `order_items`
-- [ ] Idempotency: ignore duplicate webhook events
+- [x] Migrations: `orders`, `order_items`
+- [x] Idempotency: skip duplicate events by `stripe_session_id`
+- [x] Store `stripe_session_id` on order
 
-### Deliverable
+### Local webhook testing
 
-Test card `4242 4242 4242 4242` → order in DB → cart empty.
-
-### Homework
-
-Store `stripe_session_id` on order for lookup.
+```bash
+stripe listen --forward-to localhost:8080/webhooks/stripe
+# Copy whsec_... into STRIPE_WEBHOOK_SECRET, restart API
+```
 
 ---
 
-# Phase 8 — Admin orders + polish
+# Phase 8 — Orders
 
-**Goal:** Admin sees orders; API production-ready basics.
+**Goal:** Admin and customers can view orders.
 
 ### Tasks
 
-- [ ] `GET /admin/orders` — list with items
-- [ ] Optional: decrement `products.stock` on payment
-- [ ] Consistent JSON error format: `{ "error": "message" }`
-- [ ] Request logging middleware
+- [x] `GET /admin/orders` — all orders with items + customer email
+- [x] `GET /orders` — current user's orders with items + product names
+- [ ] `PATCH /admin/orders/:id/status` → `shipped` (homework)
+- [ ] Consistent JSON error format: `{ "error": "message" }` (mostly done)
+- [x] Request logging middleware
 - [ ] Graceful shutdown (`SIGINT`)
 - [ ] Health check includes DB ping
 
 ### Deliverable
 
-Admin lists orders after a test purchase.
-
-### Homework
-
-Add `PATCH /admin/orders/:id/status` → `shipped`.
+Admin lists all orders; customer lists own orders at `GET /orders`.
 
 ---
 
@@ -288,52 +243,54 @@ Frontend on Vercel talks to deployed backend.
 
 ```env
 PORT=8080
-DATABASE_URL=postgres://...
-CLERK_JWKS_URL=https://...
+DATABASE_URL=postgres://user:password@localhost:5432/sopify?sslmode=disable
+JWT_SECRET=change-me-to-a-long-random-secret
+JWT_EXPIRY=24h
+UPLOAD_DIR=uploads
+FRONTEND_URL=http://localhost:3000
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
-FRONTEND_URL=http://localhost:3000
-UPLOAD_DIR=uploads
 ```
 
 ---
 
 ## Phase summary
 
-| Phase | Focus | Endpoints |
-|-------|--------|-----------|
+| Phase | Focus | Key endpoints |
+|-------|--------|----------------|
 | 1 | Skeleton + health | `/health` |
-| 2 | DB + products | `/products` |
+| 2 | DB + products + categories | `/products`, `/categories` |
 | 3 | Admin CRUD | `/admin/products` |
-| 4 | Clerk JWT | `/me` |
+| 4 | JWT auth | `/auth/*`, `/me` |
 | 5 | Cart | `/cart` |
 | 6 | Local image upload | multipart `/admin/products` |
 | 7 | Stripe | `/checkout`, `/webhooks/stripe` |
-| 8 | Orders + polish | `/admin/orders` |
+| 8 | Orders | `/orders`, `/admin/orders` |
 | 9 | Deploy | production |
 
 ---
 
-## Dependencies (suggested)
+## Dependencies
 
 | Package | Use |
 |---------|-----|
-| `github.com/gofiber/fiber/v3` | HTTP framework (Fiber v3) |
-| `github.com/jackc/pgx/v5` | PostgreSQL |
-| `github.com/golang-jwt/jwt/v5` | JWT verify |
-| `github.com/stripe/stripe-go/v76` | Stripe |
+| `github.com/gofiber/fiber/v3` | HTTP framework |
+| `github.com/jackc/pgx/v5` | PostgreSQL driver |
+| `github.com/golang-jwt/jwt/v5` | JWT sign/verify |
+| `github.com/stripe/stripe-go/v82` | Stripe Checkout + webhooks |
 | `github.com/joho/godotenv` | .env loading |
+| `golang.org/x/crypto` | bcrypt password hashing |
 
 ---
 
 ## Milestones
 
-1. Health endpoint live
-2. Products API live
-3. Admin can add/delete products
-4. Clerk protects routes
-5. Cart works per user
-6. Images on products
-7. Stripe payment → order created
-8. Admin sees orders
-9. Deployed
+1. [x] Health endpoint live
+2. [x] Products + categories API live
+3. [x] Admin can CRUD products
+4. [x] JWT auth protects routes
+5. [x] Cart works per user
+6. [x] Images on products (local upload)
+7. [x] Stripe payment → order created, stock decremented, cart cleared
+8. [x] Admin + customer order listing
+9. [ ] Deployed

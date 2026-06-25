@@ -31,6 +31,7 @@ func RegisterRoutes(
 	app.Patch("/cart/:product_id", authMiddleware.RequireAuth, cartHandler.UpdateItem)
 	app.Delete("/cart/:product_id", authMiddleware.RequireAuth, cartHandler.RemoveItem)
 	app.Post("/checkout", authMiddleware.RequireAuth, checkoutHandler.CreateSession)
+	app.Get("/orders", authMiddleware.RequireAuth, orderHandler.ListMyOrders)
 	app.Post("/webhooks/stripe", webhookHandler.Handle)
 
 	admin := app.Group("/admin", authMiddleware.RequireAuth, authMiddleware.RequireAdmin)

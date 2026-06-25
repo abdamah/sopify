@@ -190,6 +190,98 @@ func (r *OrderRepository) ListAllWithItems(ctx context.Context) ([]models.Order,
 	return orders, itemRows.Err()
 }
 
+func (r *OrderRepository) ListByUserIDWithItems(ctx context.Context, userID string) ([]models.Order, error) {
+	rows, err := r.db.QueryContext(ctx, `
+		SELECT
+			o.id,
+			o.user_id,
+			o.total,
+			o.status,
+			COALESCE(o.stripe_session_id, ''),
+			o.created_at,
+			o.updated_at
+		FROM orders o
+		WHERE o.user_id = $1
+		ORDER BY o.created_at DESC
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	orders := make([]models.Order, 0)
+	orderIndex := make(map[string]int)
+
+	for rows.Next() {
+		var order models.Order
+		if err := rows.Scan(
+			&order.ID,
+			&order.UserID,
+			&order.Total,
+			&order.Status,
+			&order.StripeSessionID,
+			&order.CreatedAt,
+			&order.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+
+		order.Items = make([]models.OrderItem, 0)
+		orderIndex[order.ID] = len(orders)
+		orders = append(orders, order)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if len(orders) == 0 {
+		return orders, nil
+	}
+
+	itemRows, err := r.db.QueryContext(ctx, `
+		SELECT
+			oi.id,
+			oi.order_id,
+			oi.product_id,
+			p.name,
+			oi.quantity,
+			oi.price,
+			oi.created_at
+		FROM order_items oi
+		INNER JOIN products p ON p.id = oi.product_id
+		INNER JOIN orders o ON o.id = oi.order_id
+		WHERE o.user_id = $1
+		ORDER BY oi.order_id, oi.created_at
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer itemRows.Close()
+
+	for itemRows.Next() {
+		var item models.OrderItem
+		if err := itemRows.Scan(
+			&item.ID,
+			&item.OrderID,
+			&item.ProductID,
+			&item.ProductName,
+			&item.Quantity,
+			&item.Price,
+			&item.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+
+		idx, ok := orderIndex[item.OrderID]
+		if !ok {
+			continue
+		}
+		orders[idx].Items = append(orders[idx].Items, item)
+	}
+
+	return orders, itemRows.Err()
+}
+
 func (r *OrderRepository) MarkPaid(ctx context.Context, orderID string) error {
 	_, err := r.db.ExecContext(ctx, `
 		UPDATE orders
