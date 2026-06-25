@@ -6,7 +6,7 @@ import { getMe } from "@/lib/session";
 import { getCart } from "@/actions/cart";
 import { CartLink } from "@/components/cart-link";
 import { HeaderSearch } from "@/components/header-search";
-import { LogoutButton } from "@/components/logout-button";
+import { UserAccountMenu } from "@/components/user-account-menu";
 import { getCartItemCount } from "@/lib/cart-events";
 
 
@@ -32,11 +32,6 @@ export async function Header() {
           <Link href="/products" className="nav-link">
             Shop
           </Link>
-          {user?.role === "admin" ? (
-            <Link href="/admin" className="nav-link">
-              Admin
-            </Link>
-          ) : null}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
@@ -45,11 +40,11 @@ export async function Header() {
           {user ? <CartLink initialCount={cartCount} /> : null}
 
           {user ? (
-            <div className="hidden items-center gap-2 sm:flex">
-              <span className="max-w-40 truncate rounded-full border border-border px-3 py-1.5 text-[13px] font-medium text-foreground">
-                {user.email}
-              </span>
-              <LogoutButton />
+            <div className="flex items-center">
+              <UserAccountMenu
+                email={user.email}
+                isAdmin={user.role === "admin"}
+              />
             </div>
           ) : (
             <div className="hidden items-center gap-2 sm:flex">

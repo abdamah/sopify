@@ -33,8 +33,8 @@ export default async function CheckoutSuccessPage({
         <Link href="/products" className="primary-button">
           Continue shopping
         </Link>
-        <Link href="/cart" className="secondary-button">
-          View cart
+        <Link href="/orders" className="secondary-button">
+          View my orders
         </Link>
       </div>
     </main>
