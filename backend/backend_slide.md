@@ -1,5 +1,7 @@
 # Sopify Backend — Cheatsheet
 
+> **Updated copy:** [docs/backend/CHEATSHEET.md](../docs/backend/CHEATSHEET.md) — use that for the course.
+
 **Stack:** Go 1.25+ · Fiber v3 · PostgreSQL (`pgx`) · JWT · bcrypt  
 **Module:** `github.com/abdamah/dailykode/sopify/backend`  
 **Default URL:** `http://localhost:8080`
@@ -13,8 +15,9 @@ cd backend
 cp .env.example .env          # set DATABASE_URL, JWT_SECRET
 make setup                    # migrate + seed
 make run                      # go run ./cmd/api
-curl http://localhost:8080/health
 ```
+
+Postman → import `docs/backend/Sopify.postman_collection.json` → **Health check**
 
 | Command | What it does |
 |---------|----------------|
@@ -89,57 +92,12 @@ backend/
 
 ---
 
-## curl examples
+## Postman
 
-```bash
-# Health
-curl http://localhost:8080/health
+Import **`docs/backend/Sopify.postman_collection.json`**.  
+Full request list and setup: **[docs/backend/CHEATSHEET.md](../docs/backend/CHEATSHEET.md)** → Postman section.
 
-# Products
-curl http://localhost:8080/products
-curl "http://localhost:8080/products?category=electronics"
-curl http://localhost:8080/products/<uuid>
-
-# Categories
-curl http://localhost:8080/categories
-
-# Register
-curl -X POST http://localhost:8080/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{"email":"user@test.com","password":"password123"}'
-
-# Login (save token)
-curl -X POST http://localhost:8080/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@sopify.com","password":"Abc123@@"}'
-
-# Me
-curl http://localhost:8080/me -H "Authorization: Bearer $TOKEN"
-
-# Add to cart
-curl -X POST http://localhost:8080/cart \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"product_id":"<uuid>","quantity":1}'
-
-# Start Stripe checkout
-curl -X POST http://localhost:8080/checkout \
-  -H "Authorization: Bearer $TOKEN"
-
-# Update qty (0 = remove)
-curl -X PATCH http://localhost:8080/cart/<product_id> \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"quantity":2}'
-
-# Admin create product
-curl -X POST http://localhost:8080/admin/products \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Test","description":"...","price":9.99,"stock":10,"category_id":"<uuid>"}'
-```
-
----
+Quick flow: **Login (saves token)** → **Me** → **Add to cart** → **Get cart**
 
 ## Auth (JWT)
 

@@ -8,4 +8,4 @@ sopify/
 └── frontend/   # Next.js
 ```
 
-See [sopif_course_plan.md](../sopif_course_plan.md) and [backend/backend_plan.md](backend/backend_plan.md).
+See [docs/TEACHING_STEPS.md](docs/TEACHING_STEPS.md) for the step-by-step teaching guide with code.
