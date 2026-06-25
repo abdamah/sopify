@@ -9,6 +9,7 @@ import (
 )
 
 var ErrProductNotFound = errors.New("product not found")
+var ErrInsufficientStock = errors.New("insufficient stock")
 
 type ProductRepository struct {
 	db *sql.DB
@@ -155,6 +156,28 @@ func (r *ProductRepository) DeleteProduct(ctx context.Context, id string) error 
 	}
 	if rowsAffected == 0 {
 		return ErrProductNotFound
+	}
+
+	return nil
+}
+
+func (r *ProductRepository) DecrementStock(ctx context.Context, productID string, quantity int) error {
+	result, err := r.db.ExecContext(ctx, `
+		UPDATE products
+		SET stock = stock - $2,
+		    updated_at = NOW()
+		WHERE id = $1 AND stock >= $2
+	`, productID, quantity)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrInsufficientStock
 	}
 
 	return nil

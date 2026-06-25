@@ -11,6 +11,8 @@ func RegisterRoutes(
 	categoryHandler *CategoryHandler,
 	authHandler *AuthHandler,
 	cartHandler *CartHandler,
+	checkoutHandler *CheckoutHandler,
+	webhookHandler *StripeWebhookHandler,
 	authMiddleware *middleware.AuthMiddleware,
 ) {
 	app.Get("/health", Health)
@@ -27,6 +29,8 @@ func RegisterRoutes(
 	app.Post("/cart", authMiddleware.RequireAuth, cartHandler.AddItem)
 	app.Patch("/cart/:product_id", authMiddleware.RequireAuth, cartHandler.UpdateItem)
 	app.Delete("/cart/:product_id", authMiddleware.RequireAuth, cartHandler.RemoveItem)
+	app.Post("/checkout", authMiddleware.RequireAuth, checkoutHandler.CreateSession)
+	app.Post("/webhooks/stripe", webhookHandler.Handle)
 
 	admin := app.Group("/admin", authMiddleware.RequireAuth, authMiddleware.RequireAdmin)
 	admin.Post("/products", productHandler.CreateProduct)

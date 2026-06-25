@@ -46,13 +46,16 @@ func main() {
 	categoryRepo := repository.NewCategoryRepository(db)
 	userRepo := repository.NewUserRepository(db)
 	cartRepo := repository.NewCartRepository(db)
+	orderRepo := repository.NewOrderRepository(db)
 	authMiddleware := middleware.NewAuthMiddleware(jwtService, userRepo)
 	productHandler := handlers.NewProductHandler(productRepo, categoryRepo, uploads)
 	categoryHandler := handlers.NewCategoryHandler(categoryRepo)
 	authHandler := handlers.NewAuthHandler(userRepo, jwtService)
 	cartHandler := handlers.NewCartHandler(cartRepo, productRepo)
+	checkoutHandler := handlers.NewCheckoutHandler(cartRepo, cfg)
+	webhookHandler := handlers.NewStripeWebhookHandler(orderRepo, cartRepo, productRepo, cfg)
 
-	handlers.RegisterRoutes(app, productHandler, categoryHandler, authHandler, cartHandler, authMiddleware)
+	handlers.RegisterRoutes(app, productHandler, categoryHandler, authHandler, cartHandler, checkoutHandler, webhookHandler, authMiddleware)
 
 	log.Printf("[api] listening on :%s", cfg.Port)
 	log.Fatal(app.Listen(":"+cfg.Port, fiber.ListenConfig{
