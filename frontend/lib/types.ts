@@ -51,3 +51,25 @@ export type CartResponse = {
   items: CartItem[];
   total: number;
 };
+
+export type OrderItem = {
+  id: string;
+  order_id: string;
+  product_id: string;
+  product_name?: string;
+  quantity: number;
+  price: number;
+  created_at: string;
+};
+
+export type Order = {
+  id: string;
+  user_id: string;
+  user_email?: string;
+  total: number;
+  status: string;
+  stripe_session_id?: string;
+  items?: OrderItem[];
+  created_at: string;
+  updated_at: string;
+};

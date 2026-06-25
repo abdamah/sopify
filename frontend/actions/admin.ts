@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 
 import { getToken } from "@/lib/auth";
 import { api } from "@/lib/api";
-import type { Product } from "@/lib/types";
+import { getApiErrorMessage } from "@/lib/errors";
+import type { Order, Product } from "@/lib/types";
 
 type AdminActionResult =
   | { ok: true; product: Product }
@@ -24,14 +25,6 @@ type DeleteProductResult =
       unauthenticated?: boolean;
       forbidden?: boolean;
     };
-
-function getApiErrorMessage(error: unknown, fallback: string) {
-  if (axios.isAxiosError<{ error?: string }>(error)) {
-    return error.response?.data?.error ?? fallback;
-  }
-
-  return fallback;
-}
 
 function getAdminActionError(
   error: unknown,
@@ -59,6 +52,15 @@ function getAdminActionError(
     ok: false,
     error: getApiErrorMessage(error, fallback),
   };
+}
+
+export async function getOrders(): Promise<Order[]> {
+  const token = await getToken();
+  if (!token) {
+    throw new Error("Please sign in to view orders");
+  }
+
+  return api.get<Order[]>("/admin/orders", token);
 }
 
 export async function createProduct(

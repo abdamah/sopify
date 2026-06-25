@@ -9,7 +9,7 @@
 
 ## Goal
 
-Build a storefront UI for Sopify: browse products, login/register, manage cart — powered by the Go REST API via **Server Actions** (not Next.js API routes).
+Build a storefront UI for Sopify: browse products, login/register, manage cart, checkout with Stripe, and view orders — powered by the Go REST API via **Server Actions** (not Next.js API routes).
 
 ---
 
@@ -36,33 +36,73 @@ Next.js (localhost:3000)
 
 ---
 
-## Project layout (target)
+## Project layout (current)
 
 ```
 frontend/
 ├── app/
-│   ├── layout.tsx              # root layout + header
-│   ├── page.tsx                # home
+│   ├── layout.tsx
+│   ├── page.tsx
 │   ├── products/
-│   │   ├── page.tsx            # product list
-│   │   └── [id]/page.tsx       # product detail
+│   │   ├── page.tsx
+│   │   ├── loading.tsx
+│   │   ├── error.tsx
+│   │   └── [id]/page.tsx
 │   ├── login/page.tsx
 │   ├── register/page.tsx
-│   └── cart/page.tsx
+│   ├── cart/
+│   │   ├── page.tsx
+│   │   ├── loading.tsx
+│   │   └── error.tsx
+│   ├── checkout/
+│   │   ├── success/page.tsx
+│   │   └── cancel/page.tsx
+│   ├── orders/page.tsx
+│   └── admin/
+│       ├── layout.tsx
+│       ├── page.tsx
+│       ├── loading.tsx
+│       ├── error.tsx
+│       └── orders/
+│           ├── page.tsx
+│           └── loading.tsx
 ├── actions/
 │   ├── products.ts
+│   ├── categories.ts
 │   ├── auth.ts
-│   └── cart.ts
+│   ├── cart.ts
+│   ├── checkout.ts
+│   ├── orders.ts
+│   └── admin.ts
 ├── components/
 │   ├── header.tsx
+│   ├── header-search.tsx
+│   ├── user-account-menu.tsx
+│   ├── cart-link.tsx
+│   ├── cart-contents.tsx
+│   ├── cart-quantity-controls.tsx
+│   ├── checkout-button.tsx
+│   ├── add-to-cart-form.tsx
+│   ├── remove-cart-item-button.tsx
 │   ├── product-card.tsx
+│   ├── products-list.tsx
+│   ├── product-modal.tsx
+│   ├── admin-nav.tsx
+│   ├── admin-products-panel.tsx
+│   ├── admin-orders-panel.tsx
+│   ├── my-orders-list.tsx
 │   ├── login-form.tsx
 │   ├── register-form.tsx
 │   └── ui/                     # shadcn components
 ├── lib/
 │   ├── api.ts
+│   ├── auth.ts
+│   ├── session.ts              # getMe()
 │   ├── types.ts
-│   └── utils.ts
+│   ├── utils.ts                # formatPrice, cn
+│   ├── errors.ts               # getApiErrorMessage
+│   ├── validation.ts
+│   └── cart-events.ts
 ├── .env.local
 └── next.config.ts
 ```
@@ -84,6 +124,8 @@ Backend CORS already allows `http://localhost:3000`.
 
 | Method | Route | Auth | Frontend phase |
 |--------|-------|------|----------------|
+| GET | `/health` | — | — (ops) |
+| GET | `/categories` | — | 2 |
 | GET | `/products` | — | 2 |
 | GET | `/products/:id` | — | 2 |
 | POST | `/auth/register` | — | 3 |
@@ -94,9 +136,14 @@ Backend CORS already allows `http://localhost:3000`.
 | POST | `/cart` | user | 4 |
 | PATCH | `/cart/:product_id` | user | 4 |
 | DELETE | `/cart/:product_id` | user | 4 |
+| POST | `/checkout` | user | 7 |
+| GET | `/orders` | user | 8 |
 | POST | `/admin/products` | admin | 6 |
 | PATCH | `/admin/products/:id` | admin | 6 |
 | DELETE | `/admin/products/:id` | admin | 6 |
+| GET | `/admin/orders` | admin | 8 |
+
+Stripe webhooks (`POST /webhooks/stripe`) are handled by the Go API only — not the Next.js frontend.
 
 ---
 
@@ -105,6 +152,13 @@ Backend CORS already allows `http://localhost:3000`.
 Match Go JSON (snake_case):
 
 ```ts
+type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  created_at: string;
+};
+
 type Product = {
   id: string;
   name: string;
@@ -112,6 +166,8 @@ type Product = {
   price: number;
   image_url: string;
   stock: number;
+  category_id: string;
+  category: Category;
   created_at: string;
   updated_at: string;
 };
@@ -141,6 +197,28 @@ type CartResponse = {
   items: CartItem[];
   total: number;
 };
+
+type OrderItem = {
+  id: string;
+  order_id: string;
+  product_id: string;
+  product_name?: string;
+  quantity: number;
+  price: number;
+  created_at: string;
+};
+
+type Order = {
+  id: string;
+  user_id: string;
+  user_email?: string;
+  total: number;
+  status: string;
+  stripe_session_id?: string;
+  items?: OrderItem[];
+  created_at: string;
+  updated_at: string;
+};
 ```
 
 Add types incrementally — Product first, then User/Auth, then Cart.
@@ -157,7 +235,7 @@ Add types incrementally — Product first, then User/Auth, then Cart.
 - [x] Init shadcn/ui (`button` component)
 - [x] Add `.env.local` with `NEXT_PUBLIC_API_URL`
 - [x] Root layout + placeholder home page
-- [ ] Simple header in `layout.tsx` (logo + nav links) — optional polish, can do in Phase 2.8
+- [x] Simple header in `layout.tsx` (logo + nav links)
 
 ### Verify
 
@@ -267,12 +345,12 @@ Do **one sub-step at a time**. Verify before moving on.
 
 ---
 
-### 3.3 — `actions/auth.ts`
+### 3.3 — `actions/auth.ts` + `lib/session.ts`
 
 - [x] `register(email, password)` → `POST /auth/register` → set cookie
 - [x] `login(email, password)` → `POST /auth/login` → set cookie
 - [x] `logout()` → `POST /auth/logout` with token → clear cookie
-- [x] `getMe()` → `GET /me` with token (return `null` if not logged in)
+- [x] `getMe()` in `lib/session.ts` → `GET /me` with token (return `null` if not logged in)
 
 ---
 
@@ -295,8 +373,8 @@ Do **one sub-step at a time**. Verify before moving on.
 ### 3.6 — Header auth state
 
 - [x] Show Login / Register when logged out
-- [x] Show email + Logout when logged in
-- [x] Logout button calls `logout` action
+- [x] `UserAccountMenu` dropdown when logged in (My orders, Log out; admin links for admins)
+- [x] Logout via dropdown calls `logout` action
 
 **Done when:** Can register, login, see `/me` data in header, logout invalidates session.
 
@@ -380,19 +458,44 @@ All pass token from cookie.
 
 ---
 
-# Phase 7 — Checkout UI (later)
+# Phase 7 — Checkout UI
 
 **Goal:** Stripe checkout flow.
 
-Depends on backend Phase 7 (`POST /checkout`, webhooks).
+Depends on backend `POST /checkout` and Stripe webhooks.
 
 ### Tasks
 
-- [ ] Checkout button on cart page
-- [ ] Redirect to Stripe Checkout session
-- [ ] Success / cancel pages
+- [x] `actions/checkout.ts` — `createCheckoutSession()` → `POST /checkout`
+- [x] Checkout button on cart page (`components/checkout-button.tsx`)
+- [x] Redirect to Stripe Checkout session URL
+- [x] Success page (`/checkout/success`) and cancel page (`/checkout/cancel`)
+
+**Done when:** Paying with Stripe clears the cart (via webhook) and user lands on success page.
 
 ---
+
+# Phase 8 — Orders UI
+
+**Goal:** Customer and admin order history.
+
+### Tasks
+
+- [x] `actions/orders.ts` — `getMyOrders()`, `getAdminOrders()`
+- [x] Customer orders page (`/orders`) + `MyOrdersList`
+- [x] Admin orders page (`/admin/orders`) + `AdminOrdersPanel`
+- [x] "My orders" link in `UserAccountMenu`
+- [x] Admin nav in `admin/layout.tsx` (Products, Orders)
+
+**Done when:** Logged-in users see their orders; admins see all orders with customer email.
+
+---
+
+# Phase 9 — Deploy (later)
+
+**Goal:** Production deployment (Vercel + hosted API/DB).
+
+Not started.
 
 ## shadcn components (add as needed)
 
@@ -412,7 +515,10 @@ Depends on backend Phase 7 (`POST /checkout`, webhooks).
 # Terminal 1 — backend
 cd backend && make run
 
-# Terminal 2 — frontend
+# Terminal 2 — Stripe webhooks (local dev)
+stripe listen --forward-to localhost:8080/webhooks/stripe
+
+# Terminal 3 — frontend
 cd frontend && npm run dev
 ```
 
@@ -420,6 +526,7 @@ cd frontend && npm run dev
 |-----|---------|
 | http://localhost:3000 | Frontend |
 | http://localhost:8080 | Go API |
+| http://localhost:8080/health | Health + DB ping |
 | http://localhost:8080/products | Quick API check |
 
 **Seed admin (backend):** `admin@sopify.com` / `Abc123@@` via `make seed`
@@ -436,13 +543,16 @@ cd frontend && npm run dev
 | 4 — Cart | Done |
 | 5 — Polish | Done |
 | 6 — Admin | Done |
-| 7 — Checkout | Not started |
+| 7 — Checkout | Done |
+| 8 — Orders | Done |
+| 9 — Deploy | Not started |
 
 ---
 
 ## Notes
 
 - **No React Query / Zustand** for now — Server Actions + `useTransition` is enough.
-- **No Next.js API routes** unless a future feature requires a public HTTP endpoint (e.g. webhooks).
+- **No Next.js API routes** — Stripe webhooks stay on the Go API.
 - Keep pages as **Server Components** where possible; use `"use client"` only for forms and interactive buttons.
 - Match backend JSON field names (`image_url`, not `imageUrl`) in types and components.
+- Brand accent color: orange `#F97315`.

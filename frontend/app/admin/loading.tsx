@@ -31,7 +31,7 @@ function AdminTableRowSkeleton() {
 
 export default function AdminLoading() {
   return (
-    <main className="site-container admin-wrap">
+    <>
       <div className="admin-topbar">
         <div className="skeleton h-7 w-56" />
         <div className="flex flex-wrap items-center gap-3">
@@ -67,6 +67,6 @@ export default function AdminLoading() {
           </div>
         </div>
       </div>
-    </main>
+    </>
   );
 }

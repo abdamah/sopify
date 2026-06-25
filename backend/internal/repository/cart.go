@@ -126,6 +126,14 @@ func (r *CartRepository) UpdateItemQuantity(ctx context.Context, userID, product
 	return nil
 }
 
+func (r *CartRepository) ClearByUserID(ctx context.Context, userID string) error {
+	_, err := r.db.ExecContext(ctx, `
+		DELETE FROM cart_items
+		WHERE user_id = $1
+	`, userID)
+	return err
+}
+
 func (r *CartRepository) DeleteItem(ctx context.Context, userID, productID string) error {
 	result, err := r.db.ExecContext(ctx, `
 		DELETE FROM cart_items

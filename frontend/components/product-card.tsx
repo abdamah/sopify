@@ -2,14 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { Product } from "@/lib/types";
-import { getProductImageUrl } from "@/lib/utils";
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(price);
-}
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 
 export function ProductCard({ product }: { product: Product }) {
   const isInStock = product.stock > 0;

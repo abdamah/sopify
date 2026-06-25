@@ -9,11 +9,14 @@ import (
 )
 
 type Config struct {
-	Port        string
-	DatabaseURL string
-	JWTSecret   string
-	JWTExpiry   time.Duration
-	UploadDir   string
+	Port            string
+	DatabaseURL     string
+	JWTSecret       string
+	JWTExpiry       time.Duration
+	UploadDir       string
+	StripeSecretKey     string
+	StripeWebhookSecret string
+	FrontendURL         string
 }
 
 func Load() (*Config, error) {
@@ -48,11 +51,19 @@ func Load() (*Config, error) {
 		uploadDir = "uploads"
 	}
 
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000"
+	}
+
 	return &Config{
-		Port:        port,
-		DatabaseURL: databaseURL,
-		JWTSecret:   jwtSecret,
-		JWTExpiry:   jwtExpiry,
-		UploadDir:   uploadDir,
+		Port:            port,
+		DatabaseURL:     databaseURL,
+		JWTSecret:       jwtSecret,
+		JWTExpiry:       jwtExpiry,
+		UploadDir:       uploadDir,
+		StripeSecretKey:     os.Getenv("STRIPE_SECRET_KEY"),
+		StripeWebhookSecret: os.Getenv("STRIPE_WEBHOOK_SECRET"),
+		FrontendURL:         frontendURL,
 	}, nil
 }

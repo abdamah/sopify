@@ -35,6 +35,9 @@ curl http://localhost:8080/health
 | `DATABASE_URL` | yes | `postgres://user:pass@localhost:5432/sopify?sslmode=disable` |
 | `JWT_SECRET` | yes | long random string |
 | `UPLOAD_DIR` | no | `uploads` (local product images) |
+| `FRONTEND_URL` | no | `http://localhost:3000` (Stripe success/cancel redirects) |
+| `STRIPE_SECRET_KEY` | for checkout | Stripe test secret key |
+| `STRIPE_WEBHOOK_SECRET` | for webhooks | Stripe webhook signing secret |
 
 ---
 
@@ -75,6 +78,7 @@ backend/
 | POST | `/cart` | user | `{ product_id, quantity }` |
 | PATCH | `/cart/:product_id` | user | `{ quantity }` — `0` removes item |
 | DELETE | `/cart/:product_id` | user | — |
+| POST | `/checkout` | user | — → `{ "url": "https://checkout.stripe.com/..." }` |
 | POST | `/admin/products` | admin | multipart: fields + optional `image` file |
 | PATCH | `/admin/products/:id` | admin | multipart: fields + optional `image` file |
 | DELETE | `/admin/products/:id` | admin | — |
@@ -117,6 +121,10 @@ curl -X POST http://localhost:8080/cart \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"product_id":"<uuid>","quantity":1}'
+
+# Start Stripe checkout
+curl -X POST http://localhost:8080/checkout \
+  -H "Authorization: Bearer $TOKEN"
 
 # Update qty (0 = remove)
 curl -X PATCH http://localhost:8080/cart/<product_id> \
@@ -273,7 +281,7 @@ Headers: `Authorization`, `Content-Type`
 
 | Feature | Planned |
 |---------|---------|
-| Stripe checkout | Phase 7 |
+| Stripe checkout session | Phase 7 (partial — webhook + order creation next) |
 | Orders + webhooks | Phase 7–8 |
 | Category admin CRUD | optional |
 | Clerk auth | plan only — using custom JWT today |

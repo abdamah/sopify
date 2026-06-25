@@ -7,16 +7,9 @@ import { DeleteProductButton } from "@/components/delete-product-button";
 import { ProductModal } from "@/components/product-modal";
 import { SearchInput } from "@/components/search-input";
 import type { Category, Product } from "@/lib/types";
-import { getProductImageUrl } from "@/lib/utils";
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 
 const PAGE_SIZE = 8;
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(price);
-}
 
 function StockBadge({ stock }: { stock: number }) {
   if (stock === 0) {
@@ -100,7 +93,7 @@ export function AdminProductsPanel({
   }
 
   return (
-    <div className="admin-wrap">
+    <>
       <div className="admin-topbar">
         <h1 className="admin-title">
           Product Management
@@ -257,6 +250,6 @@ export function AdminProductsPanel({
         onClose={closeModal}
         onSuccess={handleProductSaved}
       />
-    </div>
+    </>
   );
 }

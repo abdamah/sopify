@@ -6,17 +6,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { CartQuantityControls } from "@/components/cart-quantity-controls";
+import { CheckoutButton } from "@/components/checkout-button";
 import { RemoveCartItemButton } from "@/components/remove-cart-item-button";
 import { emitCartUpdated } from "@/lib/cart-events";
 import type { CartResponse } from "@/lib/types";
-import { getProductImageUrl } from "@/lib/utils";
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(price);
-}
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 
 type CartContentsProps = {
   initialCart: CartResponse;
@@ -109,16 +103,7 @@ export function CartContents({ initialCart }: CartContentsProps) {
           <span>Total</span>
           <span>{formatPrice(cart.total)}</span>
         </div>
-        <button
-          type="button"
-          className="primary-button mt-6 w-full"
-          disabled
-        >
-          Checkout (coming soon)
-        </button>
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          Stripe checkout will be available in a future update.
-        </p>
+        <CheckoutButton onUnauthenticated={handleUnauthenticated} />
       </aside>
     </div>
   );

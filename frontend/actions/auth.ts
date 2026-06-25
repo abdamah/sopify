@@ -1,9 +1,8 @@
 "use server";
 
-import axios from "axios";
-
 import { clearToken, getToken, setToken } from "@/lib/auth";
 import { api } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/errors";
 import type { AuthResponse, User } from "@/lib/types";
 
 type AuthInput = {
@@ -14,14 +13,6 @@ type AuthInput = {
 type AuthActionResult =
   | { ok: true; user: User }
   | { ok: false; error: string };
-
-function getApiErrorMessage(error: unknown, fallback: string) {
-  if (axios.isAxiosError<{ error?: string }>(error)) {
-    return error.response?.data?.error ?? fallback;
-  }
-
-  return fallback;
-}
 
 export async function register(
   email: string,
