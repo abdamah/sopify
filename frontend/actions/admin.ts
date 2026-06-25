@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 
 import { getToken } from "@/lib/auth";
 import { api } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/errors";
 import type { Product } from "@/lib/types";
 
 type AdminActionResult =
@@ -24,14 +25,6 @@ type DeleteProductResult =
       unauthenticated?: boolean;
       forbidden?: boolean;
     };
-
-function getApiErrorMessage(error: unknown, fallback: string) {
-  if (axios.isAxiosError<{ error?: string }>(error)) {
-    return error.response?.data?.error ?? fallback;
-  }
-
-  return fallback;
-}
 
 function getAdminActionError(
   error: unknown,

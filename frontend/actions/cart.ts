@@ -1,23 +1,15 @@
 "use server";
 
-import axios from "axios";
 import { revalidatePath } from "next/cache";
 
 import { getToken } from "@/lib/auth";
 import { api } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/errors";
 import type { CartResponse } from "@/lib/types";
 
 type CartActionResult =
   | { ok: true; cart: CartResponse }
   | { ok: false; error: string; unauthenticated?: boolean };
-
-function getApiErrorMessage(error: unknown, fallback: string) {
-  if (axios.isAxiosError<{ error?: string }>(error)) {
-    return error.response?.data?.error ?? fallback;
-  }
-
-  return fallback;
-}
 
 function requireToken(token: string | undefined) {
   if (!token) {

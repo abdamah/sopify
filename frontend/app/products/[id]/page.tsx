@@ -4,14 +4,7 @@ import { notFound } from "next/navigation";
 
 import { getProductById } from "@/actions/products";
 import { AddToCartForm } from "@/components/add-to-cart-form";
-import { getProductImageUrl } from "@/lib/utils";
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(price);
-}
+import { formatPrice, getProductImageUrl } from "@/lib/utils";
 
 export default async function ProductDetailPage({
   params,

@@ -1,21 +1,12 @@
 "use server";
 
-import axios from "axios";
-
 import { getToken } from "@/lib/auth";
 import { api } from "@/lib/api";
+import { getApiErrorMessage } from "@/lib/errors";
 
 type CheckoutResult =
   | { ok: true; url: string }
   | { ok: false; error: string; unauthenticated?: boolean };
-
-function getApiErrorMessage(error: unknown, fallback: string) {
-  if (axios.isAxiosError<{ error?: string }>(error)) {
-    return error.response?.data?.error ?? fallback;
-  }
-
-  return fallback;
-}
 
 export async function startCheckout(): Promise<CheckoutResult> {
   const token = await getToken();
