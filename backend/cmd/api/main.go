@@ -54,8 +54,9 @@ func main() {
 	cartHandler := handlers.NewCartHandler(cartRepo, productRepo)
 	checkoutHandler := handlers.NewCheckoutHandler(cartRepo, cfg)
 	webhookHandler := handlers.NewStripeWebhookHandler(orderRepo, cartRepo, productRepo, cfg)
+	orderHandler := handlers.NewOrderHandler(orderRepo)
 
-	handlers.RegisterRoutes(app, productHandler, categoryHandler, authHandler, cartHandler, checkoutHandler, webhookHandler, authMiddleware)
+	handlers.RegisterRoutes(app, productHandler, categoryHandler, authHandler, cartHandler, checkoutHandler, webhookHandler, orderHandler, authMiddleware)
 
 	log.Printf("[api] listening on :%s", cfg.Port)
 	log.Fatal(app.Listen(":"+cfg.Port, fiber.ListenConfig{

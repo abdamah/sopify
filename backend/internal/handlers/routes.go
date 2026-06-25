@@ -13,6 +13,7 @@ func RegisterRoutes(
 	cartHandler *CartHandler,
 	checkoutHandler *CheckoutHandler,
 	webhookHandler *StripeWebhookHandler,
+	orderHandler *OrderHandler,
 	authMiddleware *middleware.AuthMiddleware,
 ) {
 	app.Get("/health", Health)
@@ -36,4 +37,5 @@ func RegisterRoutes(
 	admin.Post("/products", productHandler.CreateProduct)
 	admin.Patch("/products/:id", productHandler.UpdateProduct)
 	admin.Delete("/products/:id", productHandler.DeleteProduct)
+	admin.Get("/orders", orderHandler.ListOrders)
 }
