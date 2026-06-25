@@ -212,8 +212,8 @@ stripe listen --forward-to localhost:8080/webhooks/stripe
 - [ ] `PATCH /admin/orders/:id/status` → `shipped` (homework)
 - [ ] Consistent JSON error format: `{ "error": "message" }` (mostly done)
 - [x] Request logging middleware
-- [ ] Graceful shutdown (`SIGINT`)
-- [ ] Health check includes DB ping
+- [x] Graceful shutdown (`SIGINT` / `SIGTERM`)
+- [x] Health check includes DB ping
 
 ### Deliverable
 
