@@ -72,4 +72,5 @@ Copy `whsec_...` into `backend/.env` as `STRIPE_WEBHOOK_SECRET`, then restart th
 | [docs/backend/CHEATSHEET.md](docs/backend/CHEATSHEET.md) | Backend + Postman reference |
 | [docs/frontend/CHEATSHEET.md](docs/frontend/CHEATSHEET.md) | Frontend reference |
 | [backend/backend_plan.md](backend/backend_plan.md) | Backend roadmap |
+| [backend/sopify-request-flow.md](backend/sopify-request-flow.md) | Backend request flow & architecture |
 | [frontend/frontend_plan.md](frontend/frontend_plan.md) | Frontend roadmap |
